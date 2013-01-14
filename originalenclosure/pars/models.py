@@ -8,6 +8,7 @@ class Par(models.Model):
   number = models.CharField(max_length=4,default='')
   title = models.CharField(max_length=200)
   hidden = models.BooleanField(default=False)
+  created = models.DateTimeField(default=datetime.now())
 
   """ _     _____ _____ _____ 
      | |   | ____|  ___|_   _|
