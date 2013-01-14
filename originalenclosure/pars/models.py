@@ -1,10 +1,10 @@
 from datetime import datetime
 from django.db import models
 from django.core.files import File
-from django.core.files.images import ImageFile
-from django.db.models.fields.files import ImageFieldFile
 
 class Par(models.Model):
+  class Meta:
+    ordering = ['number','created']
   number = models.CharField(max_length=4,default='')
   title = models.CharField(max_length=200)
   hidden = models.BooleanField(default=False)
@@ -17,6 +17,7 @@ class Par(models.Model):
      |_____|_____|_|     |_|  """
    
   left_image = models.ImageField(
+      max_length=10000,
       upload_to='pars',
       blank=True,
       )
@@ -36,6 +37,7 @@ class Par(models.Model):
      |_| \_\___\____|_| |_| |_|  """
 
   right_image = models.ImageField(
+      max_length=10000,
       upload_to='pars',
       blank=True,
       )
@@ -49,7 +51,7 @@ class Par(models.Model):
   right_dead = models.BooleanField(default=False)
 
 
-  def save(self, *args, **kwargs):
+  def saved(self, *args, **kwargs):
     if all([self.left_source, self.right_source]) and not any([self.left_image, self.right_image]):
       self.left_image = File(self._image(self.left_source))
       self.right_image = File(self._image(self.right_source))
@@ -64,4 +66,4 @@ class Par(models.Model):
     return tmp
 
   def __unicode__(self):
-    return self.title
+    return ' '.join([self.number,self.title])
