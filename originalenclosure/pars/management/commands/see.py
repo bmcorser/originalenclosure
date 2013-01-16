@@ -1,4 +1,5 @@
 import re, requests
+from datetime import datetime
 from django.core.management.base import BaseCommand, CommandError
 from pars.models import Par
 
@@ -10,11 +11,19 @@ class Command(BaseCommand):
 
   def handle(self, *args, **kwargs):
     for par in Par.objects.all():
-      from ipdb import set_trace;set_trace()
-      right_seen = self.see(par.right_source)
-      left_seen = self.see(par.left_source)
-      self.stdout.write('%s' % right_seen)
+      if par.left_source != '' and par.right_source != '':
+        self.stdout.write('%s' % par.__repr__())
+        if self.seen(par.left_source):
+          par.left_seen = datetime.now()
+        else:
+          par.left_dead = True
+        if self.seen(par.right_source):
+          par.right_seen = datetime.now()
+        else:
+          par.right_dead = True
+        par.save()
+        self.stdout.write('%s' % par.__dict__)
 
-  def see(self,url):
+  def seen(self,url):
     r = requests.head(url)
-    return r.status_code == requests.codes.ok and self.re.match(r.headers['content-type'])
+    return r.status_code == requests.codes.ok and self.re.match(r.headers['content-type']) != None
