@@ -1,4 +1,4 @@
-MEDIA_ROOT = '/Users/bmcorser/Documents/dev/originalenclosure/media'
+MEDIA_ROOT = ''
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -9,4 +9,3 @@ DATABASES = {
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
 }
-#MEDIA_ROOT = '/home/ben/work/originalenclosure/media'
