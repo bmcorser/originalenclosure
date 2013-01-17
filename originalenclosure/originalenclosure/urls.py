@@ -7,7 +7,7 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     # Examples:
-    url(r'^$', 'originalenclosure.home', name='originalenclosure.home'),
+    url(r'^$', 'originalenclosure.views.home', name='home'),
     url(r'^pars/', include('pars.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:
