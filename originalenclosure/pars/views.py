@@ -1,7 +1,8 @@
 from django.http import HttpResponseRedirect
+from django.core.urlresolvers import reverse
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-from django.core.urlresolvers import reverse
 from models import Par
 from forms import ParForm, ImageForm
 
@@ -12,10 +13,17 @@ def home(request):
       )
 
 def par(request,par):
-  par = Par.objects.get(id=par)
+  pars = Par.objects.all()
+  pages = Paginator(pars,1)
+  try:
+    page = pages.page(par)
+  except (PageNotAnInteger, EmptyPage):
+    page = pages.page(pages.num_pages)
+  par = page.object_list[0]
   return render_to_response(
       'par.html',
       {
+        'page':page,
         'par':par,
         'date':par.created.strftime('%A %Y'),
       }
