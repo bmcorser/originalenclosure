@@ -11,18 +11,13 @@ class Command(BaseCommand):
 
   def handle(self, *args, **kwargs):
     for par in Par.objects.all():
-      if par.left_source != '' and par.right_source != '':
-        self.stdout.write('%s' % par.__repr__())
-        if self.seen(par.left_source):
-          par.left_seen = datetime.now()
+      self.stdout.write('%s\n' % par.__repr__())
+      for image in [image for image in [par.left,par.right] if image.source != '']:
+        seen = self.seen(image.source)
+        if seen:
+          self.stdout.write('SEEN %s \n' % image.source)
         else:
-          par.left_dead = True
-        if self.seen(par.right_source):
-          par.right_seen = datetime.now()
-        else:
-          par.right_dead = True
-        par.save()
-        self.stdout.write('%s' % par.__dict__)
+          self.stdout.write('DID NOT SEE %s \n' % image.source)
 
   def seen(self,url):
     r = requests.head(url)

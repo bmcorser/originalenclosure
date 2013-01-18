@@ -6,12 +6,6 @@ from django.template import RequestContext
 from models import Par
 from forms import ParForm, ImageForm
 
-def home(request):
-  return render_to_response(
-      'home.html',
-      {}
-      )
-
 def par(request,par):
   pars = Par.objects.all()
   pages = Paginator(pars,1)
