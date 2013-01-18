@@ -10,6 +10,8 @@ class Image(models.Model):
       )
   source = models.URLField(
       max_length=10000,
+      blank=True,
+      null=True,
       )
   seen = models.DateField(
       default=datetime.now(),
@@ -18,6 +20,7 @@ class Image(models.Model):
   dead = models.BooleanField(default=False)
 
   def save(self, *args, **kwargs):
+    from ipdb import set_trace;set_trace()
     if self.source and not self.image:
       self.image = File(self._image(self.source))
       super(Image, self).save()
