@@ -20,10 +20,9 @@ class Image(models.Model):
   dead = models.BooleanField(default=False)
 
   def save(self, *args, **kwargs):
-    from ipdb import set_trace;set_trace()
     if self.source and not self.image:
       self.image = File(self._image(self.source))
-      super(Image, self).save()
+    super(Image, self).save()
 
   def _image(self,url):
     import requests, tempfile, os
@@ -34,7 +33,7 @@ class Image(models.Model):
     return tmp
 
   def __unicode__(self):
-    return ' '.join(['Image',self.image.name])
+    return ' '.join([self.image.name,'from',self.source])
 
 class Par(models.Model):
   class Meta:
@@ -43,8 +42,8 @@ class Par(models.Model):
   title = models.CharField(max_length=200)
   hidden = models.BooleanField(default=False)
   created = models.DateTimeField(default=datetime.now())
-  left = models.ForeignKey(Image,related_name='left',null=True,blank=True)
-  right = models.ForeignKey(Image,related_name='right',null=True,blank=True)
+  left = models.OneToOneField(Image,related_name='left',null=True,blank=True)
+  right = models.OneToOneField(Image,related_name='right',null=True,blank=True)
 
   def __unicode__(self):
     return ' '.join([self.number,self.title])
