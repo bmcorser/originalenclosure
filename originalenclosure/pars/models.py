@@ -17,7 +17,7 @@ class Image(models.Model):
       default=datetime.now(),
       null=True,
       )
-  dead = models.BooleanField(default=False)
+  dead = models.NullBooleanField(default=False,null=True,blank=True)
 
   def save(self, *args, **kwargs):
     if self.source and not self.image:
