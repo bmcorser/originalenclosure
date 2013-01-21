@@ -1,5 +1,8 @@
 {% if page.has_previous %}
-<a href="{% url edit page.previous_page_number %}">older</a>
+<a href="{% url edit page.previous_page_number %}">←</a>
+{% endif %}
+{% if page.has_next %}
+<a href="{% url edit page.next_page_number %}">→</a>
 {% endif %}
 <form method="post" action="">
 {% csrf_token %}
