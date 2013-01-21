@@ -14,13 +14,16 @@ def par(request,par):
   except (PageNotAnInteger, EmptyPage):
     page = pages.page(pages.num_pages)
   par = page.object_list[0]
-  return render_to_response(
-      'par.html',
-      {
+  template_dict = {
         'page':page,
         'par':par,
         'date':par.created.strftime('%A %Y'),
       }
+  if par.hidden:
+    template_dict['title_split'] = par.title.split(' ')
+  return render_to_response(
+      'par.html',
+      template_dict
     )
 
 def edit(request,par):
