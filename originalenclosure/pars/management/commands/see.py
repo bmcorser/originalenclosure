@@ -1,4 +1,4 @@
-import re, requests
+import re, requests, urlparse
 from datetime import date
 from django.core.management.base import BaseCommand, CommandError
 from pars.models import Par
@@ -18,12 +18,16 @@ class Command(BaseCommand):
           image.seen = date.today()
           image.dead = False
           image.save()
-          self.stdout.write('SEEN %s \n' % image.source)
+          self.stdout.write('SEEN %s\n' % image.source)
         else:
           image.dead = True
           image.save()
-          self.stdout.write('DID NOT SEE %s \n' % image.source)
+          self.stdout.write('DID NOT SEE %s\n' % image.source)
 
   def seen(self,url):
-    r = requests.head(url)
+    try:
+      r = requests.head(url)
+    except requests.exceptions.ConnectionError:
+      self.stdout.write('server error from %s\n' % urlparse.urlparse(url).netloc)
+      r = requests.Response()
     return r.status_code == requests.codes.ok and self.re.match(r.headers['content-type']) != None
