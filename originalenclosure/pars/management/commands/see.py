@@ -25,8 +25,11 @@ class Command(BaseCommand):
           self.stdout.write('DID NOT SEE %s\n' % image.source)
 
   def seen(self,url):
+    headers = {
+        'User-Agent':'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT; python requests)'
+    }
     try:
-      r = requests.head(url)
+      r = requests.head(url,headers=headers)
     except requests.exceptions.ConnectionError:
       self.stdout.write('server error from %s\n' % urlparse.urlparse(url).netloc)
       r = requests.Response()
