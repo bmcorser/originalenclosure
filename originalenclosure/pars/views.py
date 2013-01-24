@@ -64,7 +64,9 @@ def make(request):
     par = ParForm(prefix="par",instance=None)
     left = ImageForm(prefix="left",instance=None)
     right = ImageForm(prefix="right",instance=None)
+    last = Par.objects.all()[len(Par.objects.all())-1]
     return render_to_response("make.html", {
+      "last":last,
       "par":par,
       "left":left,
       "right":right,
