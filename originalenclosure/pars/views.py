@@ -6,7 +6,7 @@ from django.template import RequestContext
 from models import Par
 from forms import ParForm, ImageForm
 
-def par(request,par):
+def par(request,par=0):
   pars = Par.objects.all()
   pages = Paginator(pars,1)
   try:
