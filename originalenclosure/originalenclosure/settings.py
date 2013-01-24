@@ -1,6 +1,6 @@
 # Django settings for originalenclosure project.
 
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
