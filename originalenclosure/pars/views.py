@@ -50,6 +50,19 @@ def edit(request,par):
   },
     context_instance=RequestContext(request))
 
+def swap(request,par):
+  pars = Par.objects.all()
+  pages = Paginator(pars,1)
+  page = pages.page(par)
+  par = page.object_list[0]
+  left = par.left
+  right = par.right
+  par.left = right
+  par.right = left
+  par.save()
+  return HttpResponseRedirect(reverse('edit', args=[page.number]))
+
+
 def make(request):
   if request.method == 'POST':
     par = ParForm(request.POST,prefix="par")
@@ -59,7 +72,7 @@ def make(request):
     par.left = left.save()
     par.right = right.save()
     par.save()
-    return HttpResponseRedirect(reverse('pars'))
+    return HttpResponseRedirect(reverse('par'))
   else:
     par = ParForm(prefix="par",instance=None)
     left = ImageForm(prefix="left",instance=None)
