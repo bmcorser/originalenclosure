@@ -59,7 +59,7 @@ def make(request):
     par.left = left.save()
     par.right = right.save()
     par.save()
-    return HttpResponseRedirect(reverse('par',args=[par.id]))
+    return HttpResponseRedirect(reverse('pars'))
   else:
     par = ParForm(prefix="par",instance=None)
     left = ImageForm(prefix="left",instance=None)
