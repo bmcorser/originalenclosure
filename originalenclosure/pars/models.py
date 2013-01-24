@@ -22,6 +22,8 @@ class Image(models.Model):
   def save(self, *args, **kwargs):
     if self.source and not self.image:
       self.image = File(self._image(self.source))
+    if Image.objects.get(pk=self.pk) != self.source:
+      self.image = File(self._image(self.source))
     super(Image, self).save()
 
   def _image(self,url):
