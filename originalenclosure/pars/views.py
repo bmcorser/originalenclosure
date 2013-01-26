@@ -3,6 +3,7 @@ from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render_to_response
 from django.template import RequestContext
+from django.contrib.auth.decorators import login_required
 from models import Par
 from forms import ParForm, ImageForm
 
@@ -26,6 +27,7 @@ def par(request,par=0):
       template_dict
     )
 
+@login_required
 def edit(request,par):
   pars = Par.objects.all()
   pages = Paginator(pars,1)
@@ -50,6 +52,7 @@ def edit(request,par):
   },
     context_instance=RequestContext(request))
 
+@login_required
 def swap(request,par):
   pars = Par.objects.all()
   pages = Paginator(pars,1)
@@ -62,7 +65,7 @@ def swap(request,par):
   par.save()
   return HttpResponseRedirect(reverse('edit', args=[page.number]))
 
-
+@login_required
 def make(request):
   if request.method == 'POST':
     par = ParForm(request.POST,prefix="par")

@@ -1,6 +1,5 @@
 from datetime import datetime
 from django.db import models
-from django.core.files import File
 
 class Image(models.Model):
   image = models.ImageField(
@@ -18,21 +17,6 @@ class Image(models.Model):
       null=True,
       )
   dead = models.NullBooleanField(default=False,null=True,blank=True)
-
-  def save(self, *args, **kwargs):
-    if self.source and not self.image:
-      self.image = File(self._image(self.source))
-    if Image.objects.get(pk=self.pk).source != self.source:
-      self.image = File(self._image(self.source))
-    super(Image, self).save()
-
-  def _image(self,url):
-    import requests, tempfile, os
-    from urlparse import urlparse
-    filename = urlparse(url).path.split('/')[-1]
-    tmp = tempfile.NamedTemporaryFile(prefix="",suffix=filename)
-    tmp.write(requests.get(url).content)
-    return tmp
 
   def __unicode__(self):
     return ' '.join([self.image.name,'from',self.source])
