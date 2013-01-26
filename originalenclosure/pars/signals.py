@@ -16,7 +16,7 @@ def download(sender,instance,**kwargs):
   if instance.source and not instance.image:
     instance.image = File(_image(instance.source))
   elif Image.objects.get(pk=instance.pk).source != instance.source:
-    instance.image.delete()
+    instance.image.delete(save=False)
     tmp = _image(instance.source)
     instance.image = File(tmp)
     del(tmp)
