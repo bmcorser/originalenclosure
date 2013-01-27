@@ -1,3 +1,4 @@
+#coding: utf-8
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -88,3 +89,7 @@ def make(request):
       "right":right,
     },
     context_instance=RequestContext(request))
+
+def review():
+  u"✝★⚑☺♢"
+

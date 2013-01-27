@@ -1,3 +1,6 @@
+{% extends 'base.html' %}
+
+{% block body %}
 {% if page.has_previous %}
 <a href="{% url edit page.previous_page_number %}">←</a>
 {% endif %}
@@ -14,3 +17,4 @@
 <img src="{{ par.left.image.url }}" width="200" />
 <a href="{% url swap page.number %}">swap</a>
 <img src="{{ par.right.image.url }}" width="200" />
+{% endblock %}

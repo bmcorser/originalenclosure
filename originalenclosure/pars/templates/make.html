@@ -1,3 +1,6 @@
+{% extends 'base.html' %}
+
+{% block body %}
 <p>last par: {{ last.number }}</p>
 <form method="post" action="">
 {% csrf_token %}
@@ -7,3 +10,4 @@
 {{ par.media }}
 <input type="submit" value="make">
 </form>
+{% endblock %}
