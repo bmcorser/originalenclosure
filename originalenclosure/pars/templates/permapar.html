@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<style>
+  .hidden span{
+    background: black;
+  }
+  .hidden img {
+    visibility: hidden;
+  }
+  div {
+    display: inline-block;
+  }
+  div.hidden {
+    background: black;
+  }
+</style>
+{% endblock %}
+{% block body %}
+<a href="{% url home %}">x</a>
+<h1>
+  {{ par.number }}
+  {% if par.hidden %}
+  <span class="hidden">
+    {% for word in title_split %}
+    <span>{{ word }}</span>
+    {% endfor %}
+  </span>
+  {% else %}
+  {{ par.title }}
+  {% endif %}
+</h1>
+<div {% if par.hidden %}class="hidden"{% endif %}><img src="{{ par.left.image.url }}" width="200" /></div>
+<div {% if par.hidden %}class="hidden"{% endif %}><img src="{{ par.right.image.url }}" width="200" /></div>
+<p>{{ date }}</p>
+{% endblock %}

@@ -30,6 +30,7 @@ class Par(models.Model):
   created = models.DateTimeField(default=datetime.now())
   left = models.OneToOneField(Image,related_name='left',null=True,blank=True)
   right = models.OneToOneField(Image,related_name='right',null=True,blank=True)
+  slug = models.SlugField(max_length=1000000)
 
   def __unicode__(self):
     return ' '.join([self.number,self.title])

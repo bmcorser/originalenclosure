@@ -1,7 +1,8 @@
+from slugify import slugify
 from django.core.files import File
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
-from models import Image
+from models import Par, Image
 
 def _image(url):
   import requests, tempfile, os
@@ -21,4 +22,7 @@ def download(sender,instance,**kwargs):
     instance.image = File(tmp)
     del(tmp)
 
+@receiver(pre_save,sender=Par, dispatch_uid="par.slug.maker")
+def make_slug(sender,instance,**kwargs):
+  instance.slug = slugify(' '.join([instance.number,instance.title]))
 

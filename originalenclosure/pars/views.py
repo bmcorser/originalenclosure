@@ -28,6 +28,20 @@ def par(request,par=0):
       template_dict
     )
 
+def permapar(request,par):
+  par = ''
+  template_dict = {
+        'page':page,
+        'par':par,
+        'date':par.created.strftime('%A %Y'),
+      }
+  if par.hidden:
+    template_dict['title_split'] = par.title.split(' ')
+  return render_to_response(
+      'par.html',
+      template_dict
+    )
+
 @login_required
 def edit(request,par):
   pars = Par.objects.all()
