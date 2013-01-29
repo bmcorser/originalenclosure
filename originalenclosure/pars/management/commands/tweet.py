@@ -5,7 +5,7 @@ from django.conf import settings
 from pars.models import Par
 
 class Command(BaseCommand):
-  help = "Post to twitter"
+  help = "Publish par to Twitter"
 
   def __init__(self,*args,**kwargs):
     pass

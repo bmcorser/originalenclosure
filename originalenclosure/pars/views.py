@@ -28,10 +28,10 @@ def par(request,par=0):
       template_dict
     )
 
-def permapar(request,par):
-  par = ''
+def permapar(request,slug):
+  from ipdb import set_trace;set_trace()
+  par = Par.objects.get(slug=slug)
   template_dict = {
-        'page':page,
         'par':par,
         'date':par.created.strftime('%A %Y'),
       }
