@@ -27,7 +27,7 @@ class Par(models.Model):
   number = models.CharField(max_length=4,default='')
   title = models.CharField(max_length=200)
   hidden = models.BooleanField(default=False)
-  created = models.DateTimeField(default=datetime.now())
+  created = models.DateTimeField(auto_now_add=True)
   left = models.OneToOneField(Image,related_name='left',null=True,blank=True)
   right = models.OneToOneField(Image,related_name='right',null=True,blank=True)
 
