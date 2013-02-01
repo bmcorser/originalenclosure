@@ -66,10 +66,7 @@ def edit(request,par):
 @login_required
 def swap(request,par):
     par = Par.objects.get(number=par)
-    left = par.left
-    right = par.right
-    par.left = right
-    par.right = left
+    par.left, par.right = par.right, par.left
     par.save()
     return HttpResponseRedirect(reverse('edit', args=[par.number]))
 
