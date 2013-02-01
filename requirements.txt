@@ -1,8 +1,8 @@
 Django==1.4.3
-Jinja2==2.6
 PIL==1.1.7
 South==0.7.6
 argparse==1.2.1
 psycopg2==2.4.6
 requests==1.1.0
 wsgiref==0.1.2
+unicode-slugify==0.1

@@ -18,9 +18,6 @@
 {% endblock %}
 {% block body %}
 <a href="{% url home %}">x</a>
-{% if older %}
-<a href="{% url par older.number %}">older</a>
-{% endif %}
 <h1>
   {{ par.number }}
   {% if par.hidden %}
