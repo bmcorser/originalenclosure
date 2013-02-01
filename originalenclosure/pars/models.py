@@ -1,5 +1,9 @@
 from datetime import datetime
+import tweepy
 from django.db import models
+from django.conf import settings
+from django.template.loader import render_to_string
+from django.core.urlresolvers import reverse
 
 class Image(models.Model):
   image = models.ImageField(
@@ -30,7 +34,8 @@ class Par(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     left = models.OneToOneField(Image,related_name='left',null=True,blank=True)
     right = models.OneToOneField(Image,related_name='right',null=True,blank=True)
-    slug = models.SlugField(max_length=1000000)
+    slug = models.SlugField(max_length=1000000,blank=True)
+    in_buffer = models.BooleanField()
   
     def __unicode__(self):
         return ' '.join([self.number,self.title])
@@ -63,3 +68,15 @@ class Par(models.Model):
             return self.objects.all().reverse()[:1][0]
         else:
             return self.objects.get(number=par)
+
+    def tweet(self):
+        auth = tweepy.OAuthHandler(settings.TWITTER_CONSUMER_KEY, settings.TWITTER_CONSUMER_SECRET)
+        auth.set_access_token(settings.TWITTER_ACCESS_KEY, settings.TWITTER_ACCESS_SECRET)
+        api = tweepy.API(auth)
+        template_dict = {
+            'par':self,
+            'date':self.created.strftime('%A %Y'),
+            'url':reverse('permapar', args=[self.slug])
+        }
+        template = render_to_string('tweet.html',template_dict,)
+        api.update_status(template)

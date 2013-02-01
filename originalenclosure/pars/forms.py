@@ -4,7 +4,7 @@ from models import Par, Image
 class ParForm(ModelForm):
   class Meta:
     model = Par
-    exclude = ('created','left','right')
+    exclude = ('created','left','right','slug')
 
 class ImageForm(ModelForm):
   class Meta:

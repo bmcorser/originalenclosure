@@ -80,6 +80,7 @@ def make(request):
     par.left = left.save()
     par.right = right.save()
     par.save()
+    par.tweet()
     return HttpResponseRedirect(reverse('par'))
   else:
     par = ParForm(prefix="par",instance=None)
