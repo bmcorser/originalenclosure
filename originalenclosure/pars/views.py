@@ -8,77 +8,70 @@ from django.contrib.auth.decorators import login_required
 from models import Par
 from forms import ParForm, ImageForm
 
-def par(request,par=0):
-  pars = Par.objects.all()
-  pages = Paginator(pars,1)
-  try:
-    page = pages.page(par)
-  except (PageNotAnInteger, EmptyPage):
-    page = pages.page(pages.num_pages)
-  par = page.object_list[0]
-  template_dict = {
-        'page':page,
-        'par':par,
-        'date':par.created.strftime('%A %Y'),
-      }
-  if par.hidden:
-    template_dict['title_split'] = par.title.split(' ')
-  return render_to_response(
-      'par.html',
-      template_dict
+def par(request,par=None):
+    try:
+        par = Par.latest(par)
+    except Par.DoesNotExist:
+        return HttpResponseRedirect(reverse('par', args=['{0:04}'.format(int(par))]))
+    older = par.older()
+    template_dict = {
+            'older':older,
+            'par':par,
+            'date':par.created.strftime('%A %Y'),
+        }
+    if par.hidden:
+        template_dict['title_split'] = par.title.split(' ')
+    return render_to_response(
+        'par.html',
+        template_dict
     )
 
 def permapar(request,slug):
-  from ipdb import set_trace;set_trace()
   par = Par.objects.get(slug=slug)
   template_dict = {
-        'par':par,
-        'date':par.created.strftime('%A %Y'),
+          'older':par.older(),
+          'par':par,
+          'date':par.created.strftime('%A %Y'),
       }
   if par.hidden:
-    template_dict['title_split'] = par.title.split(' ')
+      template_dict['title_split'] = par.title.split(' ')
   return render_to_response(
       'par.html',
       template_dict
-    )
+  )
 
 @login_required
 def edit(request,par):
-  pars = Par.objects.all()
-  pages = Paginator(pars,1)
-  try:
-    page = pages.page(par)
-  except (PageNotAnInteger, EmptyPage):
-    page = pages.page(pages.num_pages)
-  par = page.object_list[0]
-  if request.method == 'POST':
-    par_form = ParForm(request.POST,instance=par,prefix="par").save()
-    left = ImageForm(request.POST,instance=par.left,prefix="left").save()
-    right = ImageForm(request.POST,instance=par.right,prefix="right").save()
-  par_form = ParForm(prefix="par",instance=par)
-  left_form = ImageForm(prefix="left",instance=par.left)
-  right_form = ImageForm(prefix="right",instance=par.right)
-  return render_to_response("edit.html", {
-    "page":page,
-    "par":par,
-    "par_form":par_form,
-    "left_form":left_form,
-    "right_form":right_form,
-  },
+    try:
+        par = Par.latest(par)
+    except Par.DoesNotExist:
+        return HttpResponseRedirect(reverse('par', args=['{0:04}'.format(int(par))]))
+    if request.method == 'POST':
+        par_form = ParForm(request.POST,instance=par,prefix="par").save()
+        left = ImageForm(request.POST,instance=par.left,prefix="left").save()
+        right = ImageForm(request.POST,instance=par.right,prefix="right").save()
+    par_form = ParForm(prefix="par",instance=par)
+    left_form = ImageForm(prefix="left",instance=par.left)
+    right_form = ImageForm(prefix="right",instance=par.right)
+    return render_to_response("edit.html", {
+        "older":par.older(),
+        "newer":par.older(1),
+        "par":par,
+        "par_form":par_form,
+        "left_form":left_form,
+        "right_form":right_form,
+    },
     context_instance=RequestContext(request))
 
 @login_required
 def swap(request,par):
-  pars = Par.objects.all()
-  pages = Paginator(pars,1)
-  page = pages.page(par)
-  par = page.object_list[0]
-  left = par.left
-  right = par.right
-  par.left = right
-  par.right = left
-  par.save()
-  return HttpResponseRedirect(reverse('edit', args=[page.number]))
+    par = Par.objects.get(number=par)
+    left = par.left
+    right = par.right
+    par.left = right
+    par.right = left
+    par.save()
+    return HttpResponseRedirect(reverse('edit', args=[par.number]))
 
 @login_required
 def make(request):

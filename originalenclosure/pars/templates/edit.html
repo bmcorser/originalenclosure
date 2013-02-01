@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 
 {% block body %}
-{% if page.has_previous %}
-<a href="{% url edit page.previous_page_number %}">←</a>
+{% if older %}
+<a href="{% url edit older.number %}">←</a>
 {% endif %}
-{% if page.has_next %}
-<a href="{% url edit page.next_page_number %}">→</a>
+{% if newer %}
+<a href="{% url edit newer.number %}">→</a>
 {% endif %}
 <form method="post" action="">
 {% csrf_token %}
@@ -15,6 +15,6 @@
 <input type="submit" value="update">
 </form>
 <img src="{{ par.left.image.url }}" width="200" />
-<a href="{% url swap page.number %}">swap</a>
+<a href="{% url swap par.number %}">swap</a>
 <img src="{{ par.right.image.url }}" width="200" />
 {% endblock %}

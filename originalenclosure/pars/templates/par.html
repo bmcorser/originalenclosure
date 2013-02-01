@@ -18,8 +18,8 @@
 {% endblock %}
 {% block body %}
 <a href="{% url home %}">x</a>
-{% if page.has_previous %}
-<a href="{% url par page.previous_page_number %}">older</a>
+{% if older %}
+<a href="{% url par older.number %}">older</a>
 {% endif %}
 <h1>
   {{ par.number }}
