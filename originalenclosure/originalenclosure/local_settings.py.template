@@ -1,5 +1,6 @@
 DEBUG = False
 MEDIA_ROOT = ''
+MEDUA_UE: = '/media/'
 CONSUMER_KEY = ''
 CONSUMER_SECRET = ''
 ACCESS_KEY = ''
@@ -15,3 +16,16 @@ DATABASES = {
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
 }
+
+TEMPLATE_CONTEXT_PROCESSORS = (
+    # defaults
+    "django.contrib.auth.context_processors.auth",
+    "django.core.context_processors.debug",
+    "django.core.context_processors.i18n",
+    "django.core.context_processors.media",
+    "django.core.context_processors.static",
+    "django.core.context_processors.tz",
+    "django.contrib.messages.context_processors.messages"
+    # dev
+    # "django.core.context_processors.static",
+)
