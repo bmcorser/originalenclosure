@@ -1,11 +1,6 @@
-DEBUG = False
+DEBUG = True
 MEDIA_ROOT = ''
-MEDUA_UE: = '/media/'
-CONSUMER_KEY = ''
-CONSUMER_SECRET = ''
-ACCESS_KEY = ''
-ACCESS_SECRET = ''
-FACEBOOK_ACCESS_TOKEN = ''
+MEDUA_URL: = '/media/'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -29,3 +24,13 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     # dev
     # "django.core.context_processors.static",
 )
+
+TWITTER_CONSUMER_KEY = ''
+TWITTER_CONSUMER_SECRET = ''
+TWITTER_ACCESS_KEY = ''
+TWITTER_ACCESS_SECRET = ''
+
+FACEBOOK_APP_ID = ''
+FACEBOOK_APP_SECRET = ''
+
+GUMROAD_TOKEN=''
