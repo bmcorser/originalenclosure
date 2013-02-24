@@ -1,4 +1,4 @@
-# Django settings for originalenclosure project.
+from datetime import timedelta
 
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
@@ -107,6 +107,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
+    'djcelery',
     'south',
     'originalenclosure',
     'pars',
@@ -139,6 +140,14 @@ LOGGING = {
             'propagate': True,
         },
     }
+}
+
+CELERYBEAT_SCHEDULE = {
+    'pars-buffer': {
+        'task': 'pars.tasks.add',
+        'schedule': timedelta(seconds=30),
+        'args': (16, 16),
+    },
 }
 
 APPEND_SLASH = True
