@@ -1,4 +1,4 @@
-from datetime import timedelta
+from celery.schedules import crontab
 import os
 
 TOP_FOLDER = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
@@ -149,8 +149,12 @@ LOGGING = {
 CELERYBEAT_SCHEDULE = {
     'pars-buffer': {
         'task': 'pars.tasks.facebook',
-        'schedule': timedelta(seconds=60),
+        'schedule': crontab(day_of_week=4,hour=18)
     },
+    'celery-test': {
+        'task': 'originalenclosure.tasks.celery_test',
+        'schedule': crontab()
+    }
 }
 
 APPEND_SLASH = True
