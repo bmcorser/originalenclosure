@@ -9,7 +9,7 @@ from celery import task
 
 @task
 def facebook():
-    if Par.objects.filter(in_buffer=True).count() > 3:
+    if Par.objects.filter(in_buffer=True).count() > 34:
 
         def percent(model, filter):
             kwargs = {filter: True}
