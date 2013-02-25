@@ -1,4 +1,7 @@
 from datetime import timedelta
+import os
+
+TOP_FOLDER = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
@@ -91,6 +94,7 @@ ROOT_URLCONF = 'originalenclosure.urls'
 WSGI_APPLICATION = 'originalenclosure.wsgi.application'
 
 TEMPLATE_DIRS = (
+    os.path.join(TOP_FOLDER, 'templates'),
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
@@ -144,9 +148,8 @@ LOGGING = {
 
 CELERYBEAT_SCHEDULE = {
     'pars-buffer': {
-        'task': 'pars.tasks.add',
-        'schedule': timedelta(seconds=30),
-        'args': (16, 16),
+        'task': 'pars.tasks.facebook',
+        'schedule': timedelta(seconds=60),
     },
 }
 
