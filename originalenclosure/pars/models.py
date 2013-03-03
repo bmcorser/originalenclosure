@@ -34,7 +34,7 @@ class Par(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     left = models.OneToOneField(Image,related_name='left',null=True,blank=True)
     right = models.OneToOneField(Image,related_name='right',null=True,blank=True)
-    slug = models.SlugField(max_length=1000000,blank=True)
+    slug = models.SlugField(max_length=204,blank=True)
     in_buffer = models.BooleanField()
   
     def __unicode__(self):
@@ -63,20 +63,22 @@ class Par(models.Model):
         return self._run(offset=offset)
 
     @classmethod
-    def latest(self,par):
+    def latest(self,par=None):
         if not par:
-            return self.objects.all().reverse()[:1][0]
+            return self.objects.filter(in_buffer=False).reverse()[:1][0]
         else:
             return self.objects.get(number=par)
 
     def tweet(self):
+        if not settings.DEBUG:
+            return
         auth = tweepy.OAuthHandler(settings.TWITTER_CONSUMER_KEY, settings.TWITTER_CONSUMER_SECRET)
         auth.set_access_token(settings.TWITTER_ACCESS_KEY, settings.TWITTER_ACCESS_SECRET)
         api = tweepy.API(auth)
         template_dict = {
             'par':self,
             'date':self.created.strftime('%A %Y'),
-            'url':reverse('permapar', args=[self.slug])
+            'url':reverse('permapar', kwargs={'slug':self.slug})
         }
         template = render_to_string('tweet.html',template_dict,)
         api.update_status(template)

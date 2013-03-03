@@ -81,7 +81,7 @@ def make(request):
     par.right = right.save()
     par.save()
     par.tweet()
-    return HttpResponseRedirect(reverse('par'))
+    return HttpResponseRedirect(reverse('make'))
   else:
     par = ParForm(prefix="par",instance=None)
     left = ImageForm(prefix="left",instance=None)

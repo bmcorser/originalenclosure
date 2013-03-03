@@ -3,3 +3,4 @@ ipdb
 pudb
 werkzeug
 django-werkzeug-debugger-runserver
+django-dynamic-fixture

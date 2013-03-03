@@ -113,10 +113,13 @@ INSTALLED_APPS = (
     # 'django.contrib.admindocs',
     'djcelery',
     'south',
+    'django_nose',
     'originalenclosure',
     'pars',
 )
 
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+NOSE_ARGS = ['--nologcapture']
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
 # the site admins on every HTTP 500 error when DEBUG=False.
