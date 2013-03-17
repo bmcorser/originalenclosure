@@ -70,7 +70,7 @@ class Par(models.Model):
             return self.objects.get(number=par)
 
     def tweet(self):
-        if not settings.DEBUG:
+        if settings.DEBUG:
             return
         auth = tweepy.OAuthHandler(settings.TWITTER_CONSUMER_KEY, settings.TWITTER_CONSUMER_SECRET)
         auth.set_access_token(settings.TWITTER_ACCESS_KEY, settings.TWITTER_ACCESS_SECRET)
