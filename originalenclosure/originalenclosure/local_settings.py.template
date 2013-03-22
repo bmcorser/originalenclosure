@@ -42,6 +42,7 @@ CONSUMER_SECRET = ''
 ACCESS_KEY = ''
 ACCESS_SECRET = ''
 FACEBOOK_ACCESS_TOKEN = ''
+GUMROAD_TOKEN = ''
 import sys
 if 'test' in sys.argv or 'test_coverage' in sys.argv: #Covers regular testing and django-coverage
     DATABASES['default']['engine'] = 'sqlite3'

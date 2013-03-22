@@ -1,17 +1,16 @@
-from django.test import TestCase
-from django_dynamic_fixture import G
 from django.core.urlresolvers import reverse
+from django.test import TestCase
+from django.test.utils import override_settings
 
 from originalenclosure.tests.tools import log_me_in
 from pars.models import Par, Image
 
+from pars.tests import factories
+
 class TestParsFunctions(TestCase):
     def setUp(self):
-        images = [G(Image) for x in range(0,4)]
-        G(Par, number='0001', title='first par',
-            left=images[0], right=images[1])
-        G(Par, number='0002', title='second par',
-            left=images[2], right=images[3])
+        for _ in range(0,10):
+            factories.ParFactory()
 
     @log_me_in
     def test_get_swap_200(self):
@@ -39,6 +38,7 @@ class TestParsFunctions(TestCase):
         self.assertEqual(resp.status_code, 200)
 
     @log_me_in
+    @override_settings(DEBUG=True)
     def test_post_make_200(self):
         """
         POSTing data to the view behind 'make' returns a 200 and creates a par
@@ -49,12 +49,6 @@ class TestParsFunctions(TestCase):
             "left-source": ["https://www.google.co.uk/images/srpr/logo4w.png"],
             "right-source": ["https://www.google.co.uk/images/srpr/logo4w.png"]
         }
-        data = {
-            u'par-number': [u'0402'],
-            u'par-title': [u'yeah yeah'],
-            u'left-source': [u'http://originalenclosure.net/media/pars/AMCFsS51Zc32UqjDL._SL500_SS500_.jpg'],
-            u'right-source': [u'https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Barrington_Hall_North.JPG/640px-Barrington_Hall_North.JPG'],
-        }
 
-        resp = self.client.post(reverse('make'),kwargs=data)
+        resp = self.client.post(reverse('make'), data=data, follow=True)
         self.assertEqual(resp.status_code, 200)

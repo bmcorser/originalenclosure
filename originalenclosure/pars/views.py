@@ -1,5 +1,5 @@
 #coding: utf-8
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render_to_response
@@ -10,9 +10,10 @@ from forms import ParForm, ImageForm
 
 def par(request,par=None):
     try:
-        par = Par.latest(par)
+        par = Par.objects.get(number=par)
     except Par.DoesNotExist:
-        return HttpResponseRedirect(reverse('par', args=['{0:04}'.format(int(par))]))
+        return HttpResponseRedirect(
+            reverse('par', args=['{0:04}'.format(int(par))]))
     older = par.older()
     template_dict = {
             'older':older,
@@ -43,7 +44,7 @@ def permapar(request,slug):
 @login_required
 def edit(request,par):
     try:
-        par = Par.latest(par)
+        par = Par.objects.get(number=par)
     except Par.DoesNotExist:
         return HttpResponseRedirect(reverse('par', args=['{0:04}'.format(int(par))]))
     if request.method == 'POST':
@@ -98,3 +99,8 @@ def make(request):
 def review():
   u"✝★⚑☺♢"
 
+def gumroad(request, hash=None):
+    return HttpResponse(
+        content_type='text/plain',
+        content='http://www.originalenclosure.net/pars/'
+    )

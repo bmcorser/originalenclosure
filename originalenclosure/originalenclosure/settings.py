@@ -107,15 +107,13 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # Uncomment the next line to enable the admin:
     'django.contrib.admin',
-    # Uncomment the next line to enable admin documentation:
-    # 'django.contrib.admindocs',
     'djcelery',
     'south',
     'django_nose',
     'originalenclosure',
     'pars',
+    'werkzeug_debugger_runserver',
 )
 
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
@@ -149,10 +147,13 @@ LOGGING = {
     }
 }
 
+CELERY_RESULT_BACKEND = "amqp"
+BROKER_URL = "amqp://guest:guest@localhost:5672//"
+
 CELERYBEAT_SCHEDULE = {
     'pars-buffer': {
         'task': 'pars.tasks.facebook',
-        'schedule': crontab(day_of_week=4,hour=18)
+        'schedule': crontab(day_of_week='tue,thu',hour=18)
     },
     'celery-test': {
         'task': 'originalenclosure.tasks.celery_test',
@@ -161,6 +162,8 @@ CELERYBEAT_SCHEDULE = {
 }
 
 APPEND_SLASH = True
+
+GUMROAD_API_URL = 'https://api.gumroad.com/v1/links'
 
 try:
       from local_settings import *

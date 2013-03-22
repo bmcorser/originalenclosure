@@ -8,4 +8,5 @@ urlpatterns = patterns('pars.views',
     url(r'^par/(?P<par>\d+)', 'par', name='par'), # catch legacy urls
     url(r'^(?P<par>\d+)', 'par', name='par'),
     url(r'^permapar/(?P<slug>[\w-]+)', 'permapar', name='permapar'),
+    url(r'^gumroad/(?P<hash>[\w-]+)', 'gumroad', name='gumroad'),
     )

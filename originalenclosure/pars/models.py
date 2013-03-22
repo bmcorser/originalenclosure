@@ -1,9 +1,16 @@
+import hashlib
 from datetime import datetime
+
+import requests
 import tweepy
+
 from django.db import models
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.core.urlresolvers import reverse
+
+from djmoney.models.fields import MoneyField
+from celery import task
 
 class Image(models.Model):
   image = models.ImageField(
@@ -63,17 +70,20 @@ class Par(models.Model):
         return self._run(offset=offset)
 
     @classmethod
-    def latest(self,par=None):
-        if not par:
-            return self.objects.filter(in_buffer=False).reverse()[:1][0]
-        else:
-            return self.objects.get(number=par)
+    def latest(self):
+        return Par.objects.filter(in_buffer=False).reverse()[:1][0]
 
     def tweet(self):
+        """
+        Send a tweet of this par to the account defined in settings.
+        Will not happen if DEBUG = True
+        """
         if settings.DEBUG:
             return
-        auth = tweepy.OAuthHandler(settings.TWITTER_CONSUMER_KEY, settings.TWITTER_CONSUMER_SECRET)
-        auth.set_access_token(settings.TWITTER_ACCESS_KEY, settings.TWITTER_ACCESS_SECRET)
+        auth = tweepy.OAuthHandler(
+            settings.TWITTER_CONSUMER_KEY, settings.TWITTER_CONSUMER_SECRET)
+        auth.set_access_token(
+            settings.TWITTER_ACCESS_KEY, settings.TWITTER_ACCESS_SECRET)
         api = tweepy.API(auth)
         template_dict = {
             'par':self,
@@ -82,3 +92,14 @@ class Par(models.Model):
         }
         template = render_to_string('tweet.html',template_dict,)
         api.update_status(template)
+
+
+    def hash(self):
+        return hashlib.sha1(str(self.created)+'webhook').hexdigest()
+
+class Purchase(models.Model):
+
+    par = models.OneToOneField(Par)
+    email = models.EmailField()
+    price = MoneyField(max_digits=10, decimal_places=2, default_currency='USD')
+    test = models.BooleanField()
