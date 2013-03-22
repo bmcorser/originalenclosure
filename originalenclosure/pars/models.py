@@ -96,10 +96,3 @@ class Par(models.Model):
 
     def hash(self):
         return hashlib.sha1(str(self.created)+'webhook').hexdigest()
-
-class Purchase(models.Model):
-
-    par = models.OneToOneField(Par)
-    email = models.EmailField()
-    price = MoneyField(max_digits=10, decimal_places=2, default_currency='USD')
-    test = models.BooleanField()
