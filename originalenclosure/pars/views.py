@@ -9,11 +9,14 @@ from models import Par
 from forms import ParForm, ImageForm
 
 def par(request,par=None):
-    try:
-        par = Par.objects.get(number=par)
-    except Par.DoesNotExist:
-        return HttpResponseRedirect(
-            reverse('par', args=['{0:04}'.format(int(par))]))
+    if par:
+        try:
+            par = Par.objects.get(number=par)
+        except Par.DoesNotExist:
+            return HttpResponseRedirect(
+                reverse('par', args=['{0:04}'.format(int(par))]))
+    else:
+        par = Par.latest()
     older = par.older()
     template_dict = {
             'older':older,
