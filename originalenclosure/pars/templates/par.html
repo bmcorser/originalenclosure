@@ -2,41 +2,59 @@
 
 {% block head %}
 <style>
-  .hidden span{
+  body, .layout {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      font-family: serif;
+  }
+  .layout {
+      padding: 20px;
+  }
+  .par {
+      width: 404px;
+      margin: 0 auto;
+  }
+  .hidden span {
     background: black;
   }
   .hidden img {
     visibility: hidden;
   }
-  div {
+  .par div {
     display: inline-block;
   }
   div.hidden {
     background: black;
   }
   body {
-      font-family: serif;
   }
 </style>
 {% endblock %}
 {% block body %}
-<a href="{% url home %}">x</a>
-{% if older %}
-<a href="{% url par older.number %}">older</a>
-{% endif %}
-<h1>
-  {{ par.number }}
-  {% if par.hidden %}
-  <span class="hidden">
-    {% for word in title_split %}
-    <span>{{ word }}</span>
-    {% endfor %}
-  </span>
-  {% else %}
-  {{ par.title }}
-  {% endif %}
-</h1>
-<div {% if par.hidden %}class="hidden"{% endif %}><img src="{{ par.left.image.url }}" width="200" /></div>
-<div {% if par.hidden %}class="hidden"{% endif %}><img src="{{ par.right.image.url }}" width="200" /></div>
-<p>{{ date }}</p>
+<div class="layout">
+  <div>
+    <a href="{% url home %}">x</a>
+    {% if older %}
+    <a href="{% url par older.number %}">older</a>
+    {% endif %}
+  </div>
+  <div class="par">
+    <h1>
+      {{ par.number }}
+      {% if par.hidden %}
+      <span class="hidden">
+        {% for word in title_split %}
+        <span>{{ word }}</span>
+        {% endfor %}
+      </span>
+      {% else %}
+      {{ par.title }}
+      {% endif %}
+    </h1>
+    <div {% if par.hidden %}class="hidden"{% endif %}><img src="{{ par.left.image.url }}" width="200" /></div>
+    <div {% if par.hidden %}class="hidden"{% endif %}><img src="{{ par.right.image.url }}" width="200" /></div>
+    <p>{{ date }}</p>
+  </div>
+</div>
 {% endblock %}

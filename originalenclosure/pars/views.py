@@ -8,6 +8,14 @@ from django.contrib.auth.decorators import login_required
 from models import Par
 from forms import ParForm, ImageForm
 
+def legacy_par(request,par):
+    try:
+        par = Par.get(number='{0:04}'.format(int(par)))
+    except Par.DoesNotExist:
+        return HttpResponseRedirect(reverse('par'))
+    return HttpResponseRedirect(
+        reverse('par', kwargs={'par':par.number}))
+
 def par(request,par=None):
     if par:
         try:
