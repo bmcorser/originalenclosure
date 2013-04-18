@@ -84,6 +84,8 @@ def swap(request,par):
 
 @login_required
 def make(request):
+  last = Par.objects.all()[len(Par.objects.all())-1]
+  next = '{0:04}'.format(int(last.number)+1)
   if request.method == 'POST':
     par = ParForm(request.POST,prefix="par")
     left = ImageForm(request.POST,prefix="left")
@@ -95,7 +97,8 @@ def make(request):
     par.tweet()
     return HttpResponseRedirect(reverse('make'))
   else:
-    par = ParForm(prefix="par",instance=None)
+    numbered_par = Par(number=next)
+    par = ParForm(prefix="par",instance=numbered_par)
     left = ImageForm(prefix="left",instance=None)
     right = ImageForm(prefix="right",instance=None)
     last = Par.objects.all()[len(Par.objects.all())-1]
