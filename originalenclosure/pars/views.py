@@ -97,7 +97,7 @@ def make(request):
     par.tweet()
     return HttpResponseRedirect(reverse('make'))
   else:
-    numbered_par = Par(number=next)
+    numbered_par = Par(number=next, in_buffer=True)
     par = ParForm(prefix="par",instance=numbered_par)
     left = ImageForm(prefix="left",instance=None)
     right = ImageForm(prefix="right",instance=None)
