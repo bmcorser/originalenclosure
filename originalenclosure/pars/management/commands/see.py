@@ -1,32 +1,24 @@
 # -*- coding: utf-8 -*-
-import re, requests, urlparse, urwid
-from datetime import date
-from django.core.management.base import BaseCommand, CommandError
-import djcelery
+from collections import namedtuple
+from datetime import datetime, timedelta
+
+from django.core.management.base import BaseCommand
+from django.conf import settings
 from pars.models import Par
 from pars.tasks import seen
-import time
-from celery import Celery
-
-class ParSee(object):
-
-    seen = None
-
-    def __unicode__(self):
-        l = self.left_seen.wait()
-        r = self.right_seen.wait()
-        def f(r):
-            if r == False:
-                return u'☺'
-            return '.'
-        return f(l)+u''+f(r)+''
 
 class Command(BaseCommand):
     help = "Sees if par images are available at source"
 
     def handle(self, *args, **kwargs):
-        for par in Par.objects.all():
-            parsee = ParSee()
-            parsee.left_seen = seen.delay(par.left)
-            parsee.right_seen = seen.delay(par.right)
-            print parsee.__unicode__()
+        print '{0} apparently'.format(settings.CELERY_RESULT_BACKEND)
+        results = []
+        ParSee = namedtuple('ParSee', ['par', 'left_seen', 'right_seen'])
+        for par in Par.objects.filter(created__gt=datetime.now() - timedelta(days=10)):
+            parsee = ParSee(par, seen.delay(par.left), seen.delay(par.right))
+            results.append(parsee)
+            print 'Added job for {0}'.format(par)
+
+        for l_async, r_async in [(result.left_seen, result.right_seen) for result in results]:
+            print l_async.state
+            print r_async.state

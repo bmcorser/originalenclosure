@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 import os, re
-from datetime import date
 
-import requests, urlparse
+import requests
 from requests.auth import HTTPBasicAuth
 
 from django.conf import settings
@@ -97,7 +96,7 @@ def seen(image):
     if url == '':
         return False
     headers = {
-        'User-Agent':'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT; python requests)'
+        'User-Agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT; python requests)'
     }
     try:
         r = requests.head(url,headers=headers)
@@ -105,4 +104,3 @@ def seen(image):
         r = requests.Response()
     regex = re.compile(r'^image')
     return r.status_code == requests.codes.ok and regex.match(r.headers['content-type']) != None
-

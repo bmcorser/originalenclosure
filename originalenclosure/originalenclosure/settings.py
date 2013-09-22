@@ -147,7 +147,7 @@ LOGGING = {
     }
 }
 
-CELERY_RESULT_BACKEND = "amqp"
+CELERY_RESULT_BACKEND = "redis://localhost/7"
 BROKER_URL = "amqp://guest:guest@localhost:5672//"
 
 CELERYBEAT_SCHEDULE = {
