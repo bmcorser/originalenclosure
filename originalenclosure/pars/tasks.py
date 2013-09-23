@@ -13,6 +13,9 @@ from pars.models import Par, Image
 from celery import task
 
 
+TIMEOUT = 10
+
+
 @task
 def facebook():
     if settings.DEBUG:
@@ -99,8 +102,15 @@ def seen(image):
         'User-Agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT; python requests)'
     }
     try:
-        r = requests.head(url,headers=headers)
-    except requests.exceptions.ConnectionError:
+        r = requests.head(url, headers=headers, timeout=TIMEOUT)
+    except (requests.exceptions.ConnectionError,
+            requests.exceptions.Timeout):
         r = requests.Response()
     regex = re.compile(r'^image')
-    return r.status_code == requests.codes.ok and regex.match(r.headers['content-type']) != None
+    if not r.status_code == requests.codes.ok:
+        return False
+    if not r.headers['content-type']:
+        r = requests.get(url, headers=headers, timeout=TIMEOUT)
+        if not r.headers['content-type']:
+            return False
+    return bool(regex.match(r.headers['content-type']))
