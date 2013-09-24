@@ -168,6 +168,6 @@ APPEND_SLASH = True
 GUMROAD_API_URL = 'https://api.gumroad.com/v1/links'
 
 try:
-      from local_settings import *
+    from local_settings import *
 except ImportError:
-      raise ImportError('mv local_settings.py.template local_settings.py && vi local_settings.py')
+    raise ImportError('mv local_settings.py.template local_settings.py && vi local_settings.py')

@@ -5,8 +5,10 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
-from models import Par
-from forms import ParForm, ImageForm
+from django.views.generic import ListView
+
+from .models import ParSeeRun, ParSee, Par
+from .forms import ParForm, ImageForm
 
 def legacy_par(request,par):
     try:
@@ -118,3 +120,8 @@ def gumroad(request, hash=None):
         content_type='text/plain',
         content='http://www.originalenclosure.net/pars/'
     )
+
+class ParSeeRunsView(ListView):
+    queryset = ParSeeRun.objects.prefetch_related().all()
+    template_name = 'pars/parseeruns.html'
+    context_object_name = 'parseeruns'

@@ -13,7 +13,7 @@ from pars.models import Par, Image
 from celery import task
 
 
-TIMEOUT = 10
+TIMEOUT = 30
 
 
 @task

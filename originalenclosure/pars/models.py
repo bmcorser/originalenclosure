@@ -1,7 +1,6 @@
 import hashlib
 from datetime import datetime
 
-import requests
 import tweepy
 
 from django.db import models
@@ -10,7 +9,6 @@ from django.template.loader import render_to_string
 from django.core.urlresolvers import reverse
 
 from djmoney.models.fields import MoneyField
-from celery import task
 
 class Image(models.Model):
   image = models.ImageField(
@@ -93,6 +91,16 @@ class Par(models.Model):
         template = render_to_string('tweet.html',template_dict,)
         api.update_status(template)
 
-
     def hash(self):
         return hashlib.sha1(str(self.created)+'webhook').hexdigest()
+
+class ParSeeRun(models.Model):
+    start = models.DateTimeField()
+    end = models.DateTimeField()
+
+class ParSee(models.Model):
+    class Meta:
+        get_latest_by = 'datetime'
+    run = models.ForeignKey(ParSeeRun, related_name='parsees')
+    par = models.ForeignKey(Par, related_name='parsees')
+    result = models.CommaSeparatedIntegerField(max_length=3)
