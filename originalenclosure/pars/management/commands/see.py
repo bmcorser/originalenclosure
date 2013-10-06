@@ -21,7 +21,7 @@ class Command(BaseCommand):
         ###################
         run_start = datetime.now()
 
-        for par in Par.objects.filter(created__gt=datetime.now() - timedelta(days=10)):
+        for par in Par.objects.all():
             temp_parsee = TempParSee(par,
                                      seen.delay(par.left),
                                      seen.delay(par.right))
@@ -48,7 +48,6 @@ class Command(BaseCommand):
         parseerun.save()
 
         for temp_parsee in results:
-            from ipdb import set_trace;set_trace()
             temp_parsee_result = u'{},{}'.format(int(temp_parsee.l.result),
                                      int(temp_parsee.r.result))
             ParSee(run=parseerun,
