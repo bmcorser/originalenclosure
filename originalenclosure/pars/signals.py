@@ -1,3 +1,6 @@
+import tempfile, os
+import requests
+from urlparse import urlparse
 from slugify import slugify
 from django.core.files import File
 from django.db.models.signals import pre_save
@@ -5,8 +8,6 @@ from django.dispatch import receiver
 from models import Par, Image
 
 def _image(url):
-    import requests, tempfile, os
-    from urlparse import urlparse
     filename = urlparse(url).path.split('/')[-1]
     tmp = tempfile.NamedTemporaryFile(prefix="",suffix=filename)
     tmp.write(requests.get(url).content)
