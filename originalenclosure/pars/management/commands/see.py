@@ -15,26 +15,26 @@ class Command(BaseCommand):
         Command to make a ParSeeRun and record all the ParSees
         """
         TempParSee = namedtuple('TempParSee', ['par','l','r'])
-        results = []
+        ready = []
         ###################
         #### RUN START ####
         ###################
         run_start = datetime.now()
 
-        for par in Par.objects.all():
+        # for par in Par.objects.all():
+        for par in Par.objects.filter(created__gt=datetime.now() - timedelta(days=10)):
             temp_parsee = TempParSee(par,
                                      seen.delay(par.left),
                                      seen.delay(par.right))
-            results.append(temp_parsee)
+            ready.append(temp_parsee)
         
-        def _ready(results):
-            result_list = []
-            for result in results:
-                finished = all([result.l.ready(), result.r.ready()])
-                result_list.append(finished)
-            return result_list
+        def _results(readies):
+            readies_list = []
+            for ready in readies:
+                readies_list.extend([ready.l.ready(), ready.r.ready()])
+            return readies_list
 
-        while not all(_ready(results)):
+        while not all(_results(ready)):
             print '[{0}] waiting'.format(datetime.now())
             sleep(1)
 
@@ -47,7 +47,7 @@ class Command(BaseCommand):
                               end=run_end)
         parseerun.save()
 
-        for temp_parsee in results:
+        for temp_parsee in ready:
             temp_parsee_result = u'{},{}'.format(int(temp_parsee.l.result),
                                      int(temp_parsee.r.result))
             ParSee(run=parseerun,
