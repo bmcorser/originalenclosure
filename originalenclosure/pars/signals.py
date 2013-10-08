@@ -14,14 +14,21 @@ def _image(url):
     return tmp
 
 @receiver(pre_save,sender=Image, dispatch_uid="par.image.download")
-def download(sender,instance,**kwargs):
+def download(sender, instance, **kwargs):
     if instance.source and not instance.image:
+        # this hasn't been run before
         instance.image = File(_image(instance.source))
-    elif Image.objects.get(pk=instance.pk).source != instance.source:
-        instance.image.delete(save=False)
-        tmp = _image(instance.source)
-        instance.image = File(tmp)
-        del(tmp)
+    else:
+        try:
+            existing_image = Image.objects.get(pk=instance.pk)
+            if existing_image.source != instance.source:
+                instance.image.delete(save=False)
+                tmp = _image(instance.source)
+                instance.image = File(tmp)
+                del(tmp)
+        except Image.DoesNotExist:
+            # we are just importing
+            pass
 
 @receiver(pre_save,sender=Par, dispatch_uid="par.slug.maker")
 def make_slug(sender,instance,**kwargs):
