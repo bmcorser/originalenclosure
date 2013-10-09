@@ -2,6 +2,7 @@ import hashlib
 from datetime import datetime
 
 import tweepy
+from bitfield import BitField
 
 from django.db import models
 from django.conf import settings
@@ -37,9 +38,11 @@ class Par(models.Model):
     title = models.CharField(max_length=200)
     hidden = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
-    left = models.OneToOneField(Image,related_name='left',null=True,blank=True)
-    right = models.OneToOneField(Image,related_name='right',null=True,blank=True)
-    slug = models.SlugField(max_length=204,blank=True)
+    left = models.OneToOneField(Image, related_name='left',
+                                null=True, blank=True)
+    right = models.OneToOneField(Image, related_name='right',
+                                 null=True, blank=True)
+    slug = models.SlugField(max_length=204, blank=True)
     in_buffer = models.BooleanField()
   
     def __unicode__(self):
@@ -51,8 +54,9 @@ class Par(models.Model):
         position = offset
         while trying:
             try:
-                return Par.objects.get(number='{0:04}'.format(int(self.number)+position))
-                trying = None
+                return Par.objects.get(number='{0:04}'.format(int(self.number)
+                                                              + position))
+                trying = False
             except Par.DoesNotExist:
                 count += 1
                 position = count*offset
@@ -103,4 +107,4 @@ class ParSee(models.Model):
         get_latest_by = 'datetime'
     run = models.ForeignKey(ParSeeRun, related_name='parsees')
     par = models.ForeignKey(Par, related_name='parsees')
-    result = models.CommaSeparatedIntegerField(max_length=3)
+    result = BitField(flags=('left', 'right'))
