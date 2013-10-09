@@ -15,28 +15,32 @@ class Command(BaseCommand):
         Command to make a ParSeeRun and record all the ParSees
         """
         TempParSee = namedtuple('TempParSee', ['par','l','r'])
-        ready = []
+        results = []
         ###################
         #### RUN START ####
         ###################
         run_start = datetime.now()
 
         # for par in Par.objects.all():
-        for par in Par.objects.filter(created__gt=datetime.now() - timedelta(days=10)):
+        for par in Par.objects.filter(created__gt=datetime.now() - timedelta(days=20)):
             temp_parsee = TempParSee(par,
                                      seen.delay(par.left),
                                      seen.delay(par.right))
-            ready.append(temp_parsee)
+            results.append(temp_parsee)
         
-        def _results(readies):
-            readies_list = []
-            for ready in readies:
-                readies_list.extend([ready.l.ready(), ready.r.ready()])
-            return readies_list
+        def _ready(result):
+            return all([result.l.ready(), result.r.ready()])
 
-        while not all(_results(ready)):
+        so_far = []
+        while not all(map(_ready, results)):
             print '[{0}] waiting'.format(datetime.now())
-            sleep(1)
+            this_poll = [result.par for result in results
+                         if result.par not in so_far
+                         and _ready(result)]
+            so_far.append(this_poll)
+            for par in this_poll:
+                self.stdout.write(par)
+            sleep(.1)
 
         #################
         #### RUN END ####
@@ -47,9 +51,12 @@ class Command(BaseCommand):
                               end=run_end)
         parseerun.save()
 
-        for temp_parsee in ready:
-            temp_parsee_result = u'{},{}'.format(int(temp_parsee.l.result),
-                                     int(temp_parsee.r.result))
-            ParSee(run=parseerun,
-                   par=temp_parsee.par,
-                   result=temp_parsee_result).save()
+        def _temp_to_db(temp_parsee):
+            parsee = ParSee(run=parseerun,
+                            par=temp_parsee.par)
+            parsee.result.left=temp_parsee.l.result
+            parsee.result.right=temp_parsee.r.result
+            parsee.save()
+            self.stdout.write('Finished looking at {0}\n'.format(parsee.par))
+
+        map(_temp_to_db, ready)

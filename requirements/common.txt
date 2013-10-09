@@ -8,3 +8,4 @@ django-celery==3.0.11
 django_nose
 django-money==0.3.3
 redis==2.8.0
+django-bitfield==1.6.4
