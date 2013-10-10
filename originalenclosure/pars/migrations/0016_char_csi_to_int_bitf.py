@@ -32,7 +32,7 @@ class Migration(DataMigration):
         csints_pks_values = bitsint_to_csints(pks_values)
         for pk, value in csints_pks_values:
             db.execute("""
-            UPDATE pars_parsee SET result = {1} WHERE id = {0};
+            UPDATE pars_parsee SET result = '{1}' WHERE id = {0};
             """.format(pk, value))
 
     models = {
