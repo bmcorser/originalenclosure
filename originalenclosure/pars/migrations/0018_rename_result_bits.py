@@ -8,16 +8,10 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Deleting field 'ParSee.result'
-        db.delete_column('pars_parsee', 'result')
-
+        db.rename_column('pars_parsee', 'result_bits', 'result')
 
     def backwards(self, orm):
-        # Adding field 'ParSee.result'
-        db.add_column('pars_parsee', 'result',
-                      self.gf('django.db.models.fields.CommaSeparatedIntegerField')(default='0,0', max_length=3),
-                      keep_default=False)
-
+        db.rename_column('pars_parsee', 'result', 'result_bits')
 
     models = {
         'pars.image': {

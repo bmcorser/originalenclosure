@@ -108,3 +108,4 @@ class ParSee(models.Model):
     run = models.ForeignKey(ParSeeRun, related_name='parsees')
     par = models.ForeignKey(Par, related_name='parsees')
     result = BitField(flags=('left', 'right'), default=0)
+    #result = models.CommaSeparatedIntegerField(max_length=3)
