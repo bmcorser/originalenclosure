@@ -5,7 +5,7 @@ djcelery.setup_loader()
 
 TOP_FOLDER = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 MEDIA_ROOT = os.path.join(TOP_FOLDER, 'media')
-MEDIA_ROOT = os.path.join(TOP_FOLDER, 'static')
+STATIC_ROOT = os.path.join(TOP_FOLDER, 'static')
 MEDIA_URL = '/media/'
 STATIC_URL = '/static/'
 
