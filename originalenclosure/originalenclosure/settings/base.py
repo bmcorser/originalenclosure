@@ -1,11 +1,15 @@
 import os
+from os.path import join, abspath, dirname
 from .secrets import *
 import djcelery
 djcelery.setup_loader()
 
-TOP_FOLDER = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
-MEDIA_ROOT = os.path.join(TOP_FOLDER, 'media')
-STATIC_ROOT = os.path.join(TOP_FOLDER, 'static')
+nest = join(*3*['..'])
+ROOT = abspath(join(dirname(__file__), nest))
+TOP_FOLDER = join(ROOT, 'originalenclosure')
+
+MEDIA_ROOT = join(ROOT, 'media')
+STATIC_ROOT = join(ROOT, 'static')
 MEDIA_URL = '/media/'
 STATIC_URL = '/static/'
 
@@ -71,7 +75,7 @@ ROOT_URLCONF = 'originalenclosure.urls'
 WSGI_APPLICATION = 'originalenclosure.wsgi.application'
 
 TEMPLATE_DIRS = (
-    os.path.join(TOP_FOLDER, 'templates'),
+    join(TOP_FOLDER, 'templates'),
 )
 
 INSTALLED_APPS = (
