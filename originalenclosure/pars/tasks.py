@@ -36,25 +36,28 @@ def facebook():
         par_buffer = Par.objects.filter(in_buffer=True) 
         for par in par_buffer:
             if par.hidden:
-                par.title = ' '.join([len(word)*'█' for word in par.title.split(' ')])
+                blank_words = [len(word)*'█' for word in par.title.split(' ')]
+                par.title = ' '.join(blank_words)
 
         message_dict = {
             'pars': par_buffer
         }
 
-        description = render_to_string('facebook/description.html', description_dict)
+        description = render_to_string('facebook/description.html',
+                                       description_dict)
         message = render_to_string('facebook/message.html', message_dict)
-
+        link = ''.join(['http://www.originalenclosure.net',reverse('parhome')])
         payload = {
             'name': 'Pars, 2010 © Ben Marshall-Corser.',
             'caption': 'New pars!',
             'description': description,
             'access_token': settings.FACEBOOK_ACCESS_TOKEN,
             'app_id': settings.FACEBOOK_APP_ID,
-            'link': ''.join(['http://www.originalenclosure.net',reverse('parhome')]),
+            'link': link,
             'message': message,
         }
-        r = requests.post('https://graph.facebook.com/benmarshallcorser/feed/',data=payload)
+        r = requests.post('https://graph.facebook.com/benmarshallcorser/feed/',
+                          data=payload)
         print r.text
         if r.status_code == 200:
             Par.objects.filter(in_buffer=True).update(in_buffer=False)
@@ -98,11 +101,9 @@ def seen(image):
     # here we go with returning an asyncresult object to poll on
     if url == '':
         return False
-    headers = {
-        'User-Agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT; python requests)'
-    }
+    ua = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT; python requests)'
     try:
-        r = requests.head(url, headers=headers, timeout=TIMEOUT)
+        r = requests.head(url, headers={'User-Agent': ua}, timeout=TIMEOUT)
     except (requests.exceptions.ConnectionError,
             requests.exceptions.Timeout):
         r = requests.Response()
