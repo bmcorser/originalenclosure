@@ -1,8 +1,11 @@
 import hashlib
 from datetime import datetime
+from os.path import join, isfile
+import uuid
 
 import tweepy
 from bitfield import BitField
+from xhtml2pdf import pisa
 
 from django.db import models
 from django.conf import settings
@@ -95,8 +98,47 @@ class Par(models.Model):
         template = render_to_string('tweet.html',template_dict,)
         api.update_status(template)
 
-    def hash(self):
-        return hashlib.sha1(str(self.created)+'webhook').hexdigest()
+class Purchase(models.Model):
+
+    def make_uuid():
+        return uuid.uuid4().get_hex()
+
+    uuid = models.CharField(max_length=32,
+                            primary_key=True,
+                            default=make_uuid,
+                            editable=False)
+    par = models.ForeignKey(Par)
+    sale = models.DateTimeField(auto_now_add=True)
+    pdf = models.CharField(max_length=1000, null=True)
+
+    def _link_callback(self, uri, rel):
+        s_u = settings.STATIC_URL
+        s_r = settings.STATIC_ROOT
+        m_u = settings.MEDIA_URL
+        m_r = settings.MEDIA_ROOT
+
+        if uri.startswith(m_u):
+            path = join(m_r, uri.replace(m_u, ''))
+        elif uri.startswith(s_u):
+            path = join(s_r, uri.replace(s_u, ''))
+
+        # make sure that file exists
+        if not isfile(path):
+                messge = 'media URI must start with %s or %s'.format(s_u, s_m)
+                raise Exception(message)
+        return path
+
+    def make_pdf(self):
+        from . import views
+        html = views.par(None,
+                         self.par.number,
+                         template_name='par_pdf.html').content
+        pdf_path = join(settings.MEDIA_ROOT, 'pars', 'purchases', self.uuid)
+        pdf = open(pdf_path, 'w+b')
+        pisa_status = pisa.CreatePDF(html, dest=pdf,
+                                     link_callback=self._link_callback)
+        pdf.close()
+        return pdf_path, pisa_status.err
 
 class ParSeeRun(models.Model):
     start = models.DateTimeField()

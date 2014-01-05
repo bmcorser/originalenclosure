@@ -18,7 +18,7 @@ def legacy_par(request,par):
     return HttpResponseRedirect(
         reverse('par', kwargs={'par':par.number}))
 
-def par(request,par=None):
+def par(request, par=None, template_name='par.html'):
     if par:
         try:
             par = Par.objects.get(number=par)
@@ -35,10 +35,7 @@ def par(request,par=None):
         }
     if par.hidden:
         template_dict['title_split'] = par.title.split(' ')
-    return render_to_response(
-        'par.html',
-        template_dict
-    )
+    return render_to_response(template_name, template_dict)
 
 def permapar(request,slug):
   par = Par.objects.get(slug=slug)
@@ -116,6 +113,7 @@ def review():
   u"✝★⚑☺♢"
 
 def gumroad(request, hash=None):
+    from ipdb import set_trace;set_trace()
     return HttpResponse(
         content_type='text/plain',
         content='http://www.originalenclosure.net/pars/'
