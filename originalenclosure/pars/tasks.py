@@ -66,29 +66,26 @@ def facebook():
 
 @task
 def make_gumroad_product(par):
-    payload = {
-        'name': par.__unicode__(),
-        'url': 'http://www.originalenclosure.net/static/pars/par.pdf',
-        'price': 100,
-        'description':'Ownership of par number {0}, entitled {1}'.format(
-            par.number, par.title),
-        'country_available': 'UK',
-        'max_purchase_count': 1,
-        'customizable_price': 'true',
-        'webhook':'http://www.originalenclosure.net/pars/gumroad/{0}'
-            .format(par.hash()),
-        'require_shipping':'false',
-        'shown_on_profile':'false',
-    }
-    files = {
-        'preview': open(os.path.join(settings.MEDIA_ROOT,'par.jpg'))
-    }
+    webhook_string = 'http://www.originalenclosure.net/pars/gumroad/{0}'
+    webhook_url = webhook_string.format(par.hash())
+    description_string = 'Ownership of par number {0}, entitled {1}'
+    description = description_string.format(par.number, par.title)
+    payload = {'name': par.__unicode__(),
+               'url': 'http://www.originalenclosure.net/static/pars/par.pdf',
+               'price': 100,
+               'description': description,
+               'country_available': 'UK',
+               'max_purchase_count': 1,
+               'customizable_price': 'true',
+               'webhook': webhook_url,
+               'require_shipping':'false',
+               'shown_on_profile':'false'}
+    files = {'preview': open(os.path.join(settings.MEDIA_ROOT,'par.jpg'))}
     response =  requests.post(
         settings.GUMROAD_API_URL,
         data=payload,
         files=files,
-        auth=HTTPBasicAuth(settings.GUMROAD_TOKEN, '',)
-    )
+        auth=HTTPBasicAuth(settings.GUMROAD_TOKEN, '',))
     return response.status_code, response.content
 
 
