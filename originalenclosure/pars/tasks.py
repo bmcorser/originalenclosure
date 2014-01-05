@@ -78,6 +78,7 @@ def make_gumroad_product(par):
         'shown_on_profile':'false',
     }
     files = {
+        # path should not be constructed here
         'preview': open(os.path.join(settings.MEDIA_ROOT,'par.jpg'))
     }
     response =  requests.post(
