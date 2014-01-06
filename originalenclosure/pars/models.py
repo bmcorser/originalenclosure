@@ -130,9 +130,7 @@ class Purchase(models.Model):
 
     def make_pdf(self):
         from . import views
-        html = views.par(None,
-                         self.par.number,
-                         template_name='par_pdf.html').content
+        html = views.par_pdf(self.par, self.uuid)
         pdf_path = join(settings.MEDIA_ROOT, 'pars', 'purchases', self.uuid)
         pdf = open(pdf_path, 'w+b')
         pisa_status = pisa.CreatePDF(html, dest=pdf,

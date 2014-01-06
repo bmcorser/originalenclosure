@@ -3,6 +3,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render_to_response
+from django.template.loader import render_to_string
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView
@@ -36,6 +37,11 @@ def par(request, par=None, template_name='par.html'):
     if par.hidden:
         template_dict['title_split'] = par.title.split(' ')
     return render_to_response(template_name, template_dict)
+
+def par_pdf(par, uuid):
+    template_dict = {'uuid': uuid, 'par': par,
+                     'date':par.created.strftime('%A %Y')}
+    return render_to_string('par_pdf.html', template_dict)
 
 def permapar(request,slug):
   par = Par.objects.get(slug=slug)
