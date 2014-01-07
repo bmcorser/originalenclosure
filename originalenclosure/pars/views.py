@@ -19,14 +19,18 @@ def legacy_par(request,par):
         reverse('par', kwargs={'par':par.number}))
 
 def par(request,par=None):
-    if par:
+    if not par:
+        par = Par.latest()
+    else:
         try:
             par = Par.objects.get(number=par)
         except Par.DoesNotExist:
+            padded = '{0:04}'.format(int(par))
+            if padded != par:
+                return HttpResponseRedirect(
+                    reverse('par', args=[padded]))
             return HttpResponseRedirect(
-                reverse('par', args=['{0:04}'.format(int(par))]))
-    else:
-        par = Par.latest()
+                reverse('par', args=[Par.latest().number]))
     older = par.older()
     template_dict = {
             'older':older,
