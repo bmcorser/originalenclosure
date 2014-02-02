@@ -20,7 +20,7 @@ TIMEOUT = 30
 def facebook():
     if settings.DEBUG:
         return
-    if Par.objects.filter(in_buffer=True).count() > 17:
+    if Par.objects.filter(in_buffer=True).count() >= 17:
 
         def percent(model, filter):
             kwargs = {filter: True}
