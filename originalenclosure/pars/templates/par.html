@@ -55,6 +55,7 @@
     </h1>
     <div {% if par.hidden %}class="hidden"{% endif %}><img src="{{ par.left.image.url }}" width="200" /></div>
     <div {% if par.hidden %}class="hidden"{% endif %}><img src="{{ par.right.image.url }}" width="200" /></div>
+    <a href="{% url purchase par.slug %}">$</a>
     <p>{{ date }}</p>
   </div>
 </div>

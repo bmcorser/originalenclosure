@@ -10,10 +10,11 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         # Adding model 'Purchase'
         db.create_table('pars_purchase', (
-            ('uuid', self.gf('django.db.models.fields.CharField')(default='e8e1c79730884af3b37f69da4b99c9d1', max_length=32, primary_key=True)),
+            ('uuid', self.gf('django.db.models.fields.CharField')(default='734f1927dcec41b2b12ca1e4ddcc9a18', max_length=32, primary_key=True)),
             ('par', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['pars.Par'])),
             ('sale', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
             ('pdf', self.gf('django.db.models.fields.CharField')(max_length=1000, null=True)),
+            ('gumroad_id', self.gf('django.db.models.fields.CharField')(default='', max_length=512, null=True, blank=True)),
         ))
         db.send_create_signal('pars', ['Purchase'])
 
@@ -75,10 +76,11 @@ class Migration(SchemaMigration):
         },
         'pars.purchase': {
             'Meta': {'object_name': 'Purchase'},
+            'gumroad_id': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '512', 'null': 'True', 'blank': 'True'}),
             'par': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['pars.Par']"}),
             'pdf': ('django.db.models.fields.CharField', [], {'max_length': '1000', 'null': 'True'}),
             'sale': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'uuid': ('django.db.models.fields.CharField', [], {'default': "'9d6fd00b8258479a928ec8d9b6f58fb2'", 'max_length': '32', 'primary_key': 'True'})
+            'uuid': ('django.db.models.fields.CharField', [], {'default': "'c9d6320e79734f628c635c97387b9752'", 'max_length': '32', 'primary_key': 'True'})
         }
     }
 

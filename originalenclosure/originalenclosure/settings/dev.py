@@ -1,5 +1,5 @@
 from .base import *
-DOMAIN = 'http://localhost:8000'
+DOMAIN = 'http://www.originalenclosure.net:8000'
 DEBUG = True
 DATABASES = {
     'default': {

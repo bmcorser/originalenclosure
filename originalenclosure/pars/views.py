@@ -1,14 +1,17 @@
 #coding: utf-8
+from os.path import join
 from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.conf import settings
 from django.shortcuts import render_to_response
 from django.template.loader import render_to_string
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView
 
-from .models import ParSeeRun, ParSee, Par
+from .models import ParSeeRun, ParSee, Par, Purchase
+from . import purchases
 from .forms import ParForm, ImageForm
 
 def legacy_par(request,par):
@@ -129,3 +132,12 @@ class ParSeeRunsView(ListView):
     queryset = ParSeeRun.objects.prefetch_related().all()
     template_name = 'pars/parseeruns.html'
     context_object_name = 'parseeruns'
+
+def purchase(request, slug):
+    par = Par.objects.get(slug=slug)
+    purchase = Purchase(par=par)
+    purchase.save()
+    purchase.pdf = purchases.make_pdf(par, purchase.uuid)
+    purchase.save()
+    pdf_url = join(settings.MEDIA_URL, 'pars', 'purchases', purchase.pdf)
+    return render_to_response('pars/purchase.html', {'pdf_url': pdf_url})
