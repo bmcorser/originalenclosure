@@ -1,11 +1,11 @@
-from os.path import join
+from os.path import join, isfile
 from subprocess import Popen
 
 import xhtml2pdf.pisa as pisa
 
 from django.conf import settings
 
-def _link_callback(self, uri, rel):
+def _link_callback(uri, rel):
     s_u = settings.STATIC_URL
     s_r = settings.STATIC_ROOT
     m_u = settings.MEDIA_URL
