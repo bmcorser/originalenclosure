@@ -10,7 +10,7 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         # Adding model 'Purchase'
         db.create_table('pars_purchase', (
-            ('uuid', self.gf('django.db.models.fields.CharField')(default='734f1927dcec41b2b12ca1e4ddcc9a18', max_length=32, primary_key=True)),
+            ('uuid', self.gf('django.db.models.fields.CharField')(default='d19f538849f2457fac306fc52016db5d', max_length=32, primary_key=True)),
             ('par', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['pars.Par'])),
             ('sale', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
             ('pdf', self.gf('django.db.models.fields.CharField')(max_length=1000, null=True)),
@@ -18,26 +18,9 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('pars', ['Purchase'])
 
-        # Deleting field 'ParSee.result_bits'
-        db.delete_column('pars_parsee', 'result_bits')
-
-        # Adding field 'ParSee.result'
-        db.add_column('pars_parsee', 'result',
-                      self.gf('django.db.models.fields.BigIntegerField')(default=0),
-                      keep_default=False)
-
-
     def backwards(self, orm):
         # Deleting model 'Purchase'
         db.delete_table('pars_purchase')
-
-        # Adding field 'ParSee.result_bits'
-        db.add_column('pars_parsee', 'result_bits',
-                      self.gf('django.db.models.fields.BigIntegerField')(default=0),
-                      keep_default=False)
-
-        # Deleting field 'ParSee.result'
-        db.delete_column('pars_parsee', 'result')
 
 
     models = {
@@ -80,7 +63,7 @@ class Migration(SchemaMigration):
             'par': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['pars.Par']"}),
             'pdf': ('django.db.models.fields.CharField', [], {'max_length': '1000', 'null': 'True'}),
             'sale': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'uuid': ('django.db.models.fields.CharField', [], {'default': "'c9d6320e79734f628c635c97387b9752'", 'max_length': '32', 'primary_key': 'True'})
+            'uuid': ('django.db.models.fields.CharField', [], {'default': "'69806582c89e45f5b0788a5c12ecc0ce'", 'max_length': '32', 'primary_key': 'True'})
         }
     }
 
