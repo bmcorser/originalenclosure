@@ -140,4 +140,7 @@ def purchase(request, slug):
     purchase.pdf = purchases.make_pdf(par, purchase.uuid)
     purchase.save()
     pdf_url = join(settings.MEDIA_URL, 'pars', 'purchases', purchase.pdf)
-    return render_to_response('pars/purchase.html', {'pdf_url': pdf_url})
+    purchase = purchases.make_gumroad_product(purchase)
+    return render_to_response(
+        'pars/purchase.html',
+        {'gumroad_id': purchase.gumroad_id, 'pdf_url': pdf_url})

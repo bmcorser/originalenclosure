@@ -1,5 +1,7 @@
 from os.path import join, isfile
 from subprocess import Popen
+import json
+import requests
 
 import xhtml2pdf.pisa as pisa
 
@@ -36,30 +38,29 @@ def make_pdf(par, uuid=None):
     pdf.close()
     return filename
 
-def make_png(self, pdf_path):
+def make_png(pdf_path, purchase):
     purchases_path = join(settings.MEDIA_ROOT,
-                            'pars',
-                            'purchases')
-    outpath = join(purchases_path, '{0}.png'.format(self.uuid))
+                          'pars',
+                          'purchases')
+    outpath = join(purchases_path, '{0}.png'.format(purchase.uuid))
     ghostscript_cmd = [
         'gs',
         '-sDEVICE=png16m',
         '-sOutputFile={0}'.format(outpath),
-        '-r1200',
+        '-r600',
         '-dDownScaleFactor=6',
         '-dQUIET',
         '-dBATCH',
         '-dNOPAUSE',
-        join(purchases_path, self.uuid),
+        join(purchases_path, purchase.pdf),
     ]
     assert Popen(ghostscript_cmd).wait() == 0
     return outpath
 
-def make_gumroad_product(self):
-    from ipdb import set_trace;set_trace()
+def make_gumroad_product(purchase):
     url = 'https://api.gumroad.com/v2/products'
-    pdf_path, err = self.make_pdf()
-    png_path = self.make_png(pdf_path)
+    pdf_path = join(settings.MEDIA_ROOT, 'pars', 'purchases', purchase.pdf)
+    png_path = make_png(pdf_path, purchase)
     url_components = [
         settings.DOMAIN,
         settings.MEDIA_URL.strip('/'),
@@ -67,15 +68,15 @@ def make_gumroad_product(self):
         'purchases',
     ]
     data = {
-        'url': '/'.join(url_components + [self.uuid]),
-        'preview_url': '/'.join(url_components + ['{0}.png'.format(self.uuid)]),
+        'url': '/'.join(url_components + [purchase.pdf]),
+        'preview_url': '/'.join(url_components + ['{0}.png'.format(purchase.uuid)]),
         'access_token': settings.GUMROAD_ACCESS_TOKEN,
-        'name': '{0} ({1})'.format(self.par, self.uuid),
+        'name': '{0} ({1})'.format(purchase.par, purchase.uuid),
         'price': 100,
     }
     response = requests.post(url, data=data)
     response_dict = json.loads(response.content)
-    self.gumroad_id = response_dict['product']['id']
-    self.save()
-    return response
-
+    short_url = response_dict['product']['short_url']
+    purchase.gumroad_id = short_url.split('/')[-1:][0]
+    purchase.save()
+    return purchase

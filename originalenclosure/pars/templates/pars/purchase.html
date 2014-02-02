@@ -31,12 +31,14 @@
   body {
   }
 </style>
+<script type="text/javascript" src="http://gumroad.com/js/gumroad-embed.js"></script>
 {% endblock %}
 {% block body %}
 <div class="layout">
   <div>
-    <a href="{% url home %}">x</a>
-    <p>thanks</p>
+    <a href="{% url pars %}">x</a>
+      <p>thanks</p>
+      <div class="gumroad-product-embed" data-gumroad-product-id="{{ gumroad_id }}"></div>
     <a href="{{ pdf_url }}">pdf</a>
   </div>
 </div>
