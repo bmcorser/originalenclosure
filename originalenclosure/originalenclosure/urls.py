@@ -12,10 +12,9 @@ urlpatterns = patterns('',
         {'template':'home.html'},
         name='home'),
     url(
-        r'^mcfp/$',
-        direct_to_template,
-        {'template':'home.html'},
-        name='home'),
+        r'^mcfp/$', direct_to_template, {'template':'home.html'}, name='home'),
+    url(r'^favicon\.ico$', 'django.views.generic.simple.redirect_to',
+        {'url': '/static/favicon.ico'}),
 
     # admin / login
     url(r'^accounts/login/$', 'django.contrib.auth.views.login', {'template_name': 'login.html'}),
@@ -29,4 +28,6 @@ urlpatterns = patterns('',
 if settings.DEBUG:
   urlpatterns += patterns('',
     (r'^media/(?P<path>.*)$', 'django.views.static.serve', {
-     'document_root': settings.MEDIA_ROOT}))
+     'document_root': settings.MEDIA_ROOT}),
+    (r'^static/(?P<path>.*)$', 'django.views.static.serve', {
+     'document_root': settings.STATIC_ROOT}))

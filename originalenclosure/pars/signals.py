@@ -33,4 +33,3 @@ def download(sender, instance, **kwargs):
 @receiver(pre_save,sender=Par, dispatch_uid="par.slug.maker")
 def make_slug(sender,instance,**kwargs):
     instance.slug = slugify(' '.join([instance.number,instance.title]))
-

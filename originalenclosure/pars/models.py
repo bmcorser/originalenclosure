@@ -1,10 +1,13 @@
-import hashlib
 from datetime import datetime
+import hashlib
+import json
 from os.path import join, isfile
 import uuid
+from subprocess import Popen
 
-import tweepy
 from bitfield import BitField
+import requests
+import tweepy
 from xhtml2pdf import pisa
 
 from django.db import models
@@ -47,7 +50,7 @@ class Par(models.Model):
                                  null=True, blank=True)
     slug = models.SlugField(max_length=204, blank=True)
     in_buffer = models.BooleanField()
-  
+
     def __unicode__(self):
         return ' '.join([self.number,self.title])
 
@@ -110,6 +113,10 @@ class Purchase(models.Model):
     par = models.ForeignKey(Par)
     sale = models.DateTimeField(auto_now_add=True)
     pdf = models.CharField(max_length=1000, null=True)
+    gumroad_id = models.CharField(max_length=512,
+                                  null=True,
+                                  blank=True,
+                                  default='')
 
     def _link_callback(self, uri, rel):
         s_u = settings.STATIC_URL
@@ -137,6 +144,48 @@ class Purchase(models.Model):
                                      link_callback=self._link_callback)
         pdf.close()
         return pdf_path, pisa_status.err
+
+    def make_png(self, pdf_path):
+        purchases_path = join(settings.MEDIA_ROOT,
+                              'pars',
+                              'purchases')
+        outpath = join(purchases_path, '{0}.png'.format(self.uuid))
+        ghostscript_cmd = [
+            'gs',
+            '-sDEVICE=png16m',
+            '-sOutputFile={0}'.format(outpath),
+            '-r1200',
+            '-dDownScaleFactor=6',
+            '-dQUIET',
+            '-dBATCH',
+            '-dNOPAUSE',
+            join(purchases_path, self.uuid),
+        ]
+        assert Popen(ghostscript_cmd).wait() == 0
+        return outpath
+
+    def make_gumroad_product(self):
+        url = 'https://api.gumroad.com/v2/products'
+        pdf_path, err = self.make_pdf()
+        png_path = self.make_png(pdf_path)
+        url_components = [
+            settings.DOMAIN,
+            settings.MEDIA_URL.strip('/'),
+            'pars',
+            'purchases',
+        ]
+        data = {
+            'url': '/'.join(url_components + [self.uuid]),
+            'preview_url': '/'.join(url_components + ['{0}.png'.format(self.uuid)]),
+            'access_token': settings.GUMROAD_ACCESS_TOKEN,
+            'name': '{0} ({1})'.format(self.par, self.uuid),
+            'price': 100,
+        }
+        response = requests.post(url, data=data)
+        response_dict = json.loads(response.content)
+        self.gumroad_id = response_dict['product']['id']
+        self.save()
+        return response
 
 class ParSeeRun(models.Model):
     start = models.DateTimeField()

@@ -1,4 +1,5 @@
 from .base import *
+DOMAIN = 'http://localhost:8000'
 DEBUG = True
 DATABASES = {
     'default': {
