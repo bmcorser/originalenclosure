@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<style>
+  body, .layout {
+      margin: 0;
+      padding: 0;
+      font-family: serif;
+  }
+  .layout {
+      margin: 20px;
+      width: auto;
+  }
+  .par {
+      width: 405px;
+      margin: 0 auto;
+  }
+  .hidden span {
+    background: black;
+  }
+  .hidden img {
+    visibility: hidden;
+  }
+  .par div {
+    display: inline;
+  }
+  div.hidden {
+    background: black;
+  }
+  body {
+  }
+</style>
+{% endblock %}
+{% block body %}
+<div class="layout">
+    <p align="right" style="font-weight: normal; font-size: 10px; margin-right: 153px;">{{ uuid }}</p>
+        <h1 style="margin-left: 153px; font-size: 30px;">&nbsp;</h1>
+        <h1 style="margin-left: 153px; font-size: 30px;">{{ par.number }} {{ par.title }}</h1>
+        <p align="center">
+            <img src="{{ par.left.image.url }}" width="200" />&nbsp;
+            <img src="{{ par.right.image.url }}" width="200" />
+        </p>
+        <p style="margin-left: 153px; font-weight: normal; font-size: 10px;">{{ date }}</p>
+</div>
+{% endblock %}
