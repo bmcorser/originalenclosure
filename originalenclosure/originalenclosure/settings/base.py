@@ -27,7 +27,7 @@ DATABASES = {
 
 APPEND_SLASH = True
 
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -98,4 +98,4 @@ TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 NOSE_ARGS = ['--nologcapture']
 
 GUMROAD_API_URL = 'https://api.gumroad.com/v1/links'
-DOMAIN = 'http://www.originalenclosure.net'
+DOMAIN = 'https://originalenclosure.net'

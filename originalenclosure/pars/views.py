@@ -139,8 +139,16 @@ def purchase(request, slug):
     purchase.save()
     purchase.pdf = purchases.make_pdf(par, purchase.uuid)
     purchase.save()
-    pdf_url = join(settings.MEDIA_URL, 'pars', 'purchases', purchase.pdf)
     purchase = purchases.make_gumroad_product(purchase)
-    return render_to_response(
-        'pars/purchase.html',
-        {'gumroad_id': purchase.gumroad_id, 'pdf_url': pdf_url})
+    redirect_kwargs = {'slug': par.slug, 'uuid': purchase.uuid}
+    return HttpResponseRedirect(reverse('purchase_rendered',
+                                        kwargs=redirect_kwargs))
+
+def purchase_rendered(request, slug, uuid):
+    par = Par.objects.get(slug=slug)
+    purchase = Purchase.objects.get(uuid=uuid)
+    template_dict = {
+        'par': par,
+        'gumroad_id': purchase.gumroad_id,
+    }
+    return render_to_response('pars/purchase.html', template_dict)

@@ -12,4 +12,7 @@ urlpatterns = patterns('pars.views',
     url(r'^gumroad/(?P<hash>[\w-]+)', 'gumroad', name='gumroad'),
     url(r'^parseeruns', ParSeeRunsView.as_view(), name='parseeruns'),
     url(r'^purchase/(?P<slug>[\w-]+)', 'purchase', name='purchase'),
+    url(r'^purchase_rendered/(?P<slug>[\w-]+)/(?P<uuid>[\w]+)',
+        'purchase_rendered',
+        name='purchase_rendered'),
     )
