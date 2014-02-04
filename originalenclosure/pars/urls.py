@@ -15,4 +15,5 @@ urlpatterns = patterns('pars.views',
     url(r'^purchase_rendered/(?P<slug>[\w-]+)/(?P<uuid>[\w]+)',
         'purchase_rendered',
         name='purchase_rendered'),
+    url(r'^gumroad-ping', 'gumroad_ping'),
     )

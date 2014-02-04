@@ -2,6 +2,7 @@ from datetime import datetime
 import hashlib
 import json
 from os.path import join, isfile
+from os import remove
 import uuid
 from subprocess import Popen
 
@@ -101,6 +102,7 @@ class Par(models.Model):
         template = render_to_string('tweet.html',template_dict,)
         api.update_status(template)
 
+
 class Purchase(models.Model):
 
     def make_uuid():
@@ -111,12 +113,15 @@ class Purchase(models.Model):
                             default=make_uuid,
                             editable=False)
     par = models.ForeignKey(Par)
-    sale = models.DateTimeField(auto_now_add=True)
+    sale = models.DateTimeField(null=True)
     pdf = models.CharField(max_length=1000, null=True)
     gumroad_id = models.CharField(max_length=512,
                                   null=True,
                                   blank=True,
                                   default='')
+
+    def __unicode__(self):
+        return '{0} ({1})'.format(self.par, self.uuid)
 
 
 class ParSeeRun(models.Model):

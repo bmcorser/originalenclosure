@@ -1,4 +1,6 @@
 #coding: utf-8
+from datetime import datetime
+from django.views.decorators.csrf import csrf_exempt
 from os.path import join
 from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
@@ -152,3 +154,10 @@ def purchase_rendered(request, slug, uuid):
         'gumroad_id': purchase.gumroad_id,
     }
     return render_to_response('pars/purchase.html', template_dict)
+
+@csrf_exempt
+def gumroad_ping(request):
+    purchase = Purchase.objects.get(gumroad_id=request.POST['permalink'])
+    purchase.sale = datetime.now()
+    purchase.save()
+    return HttpResponse()

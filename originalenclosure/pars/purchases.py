@@ -2,6 +2,7 @@ from os.path import join, isfile
 from subprocess import Popen
 import json
 import requests
+from pars.models import Purchase
 
 import xhtml2pdf.pisa as pisa
 
@@ -58,6 +59,11 @@ def make_png(pdf_path, purchase):
     return outpath
 
 def make_gumroad_product(purchase):
+    filter_kwargs = {
+        'par': purchase.par,
+        'sale__isnull': False,
+    }
+    purchase_count = Purchase.objects.filter(**filter_kwargs).count()
     url = 'https://api.gumroad.com/v2/products'
     pdf_path = join(settings.MEDIA_ROOT, 'pars', 'purchases', purchase.pdf)
     png_path = make_png(pdf_path, purchase)
@@ -72,7 +78,7 @@ def make_gumroad_product(purchase):
         'preview_url': '/'.join(url_components + ['{0}.png'.format(purchase.uuid)]),
         'access_token': settings.GUMROAD_ACCESS_TOKEN,
         'name': '{0} ({1})'.format(purchase.par, purchase.uuid),
-        'price': 100,
+        'price':  (purchase_count + 1) * 100,
     }
     response = requests.post(url, data=data)
     response_dict = json.loads(response.content)
