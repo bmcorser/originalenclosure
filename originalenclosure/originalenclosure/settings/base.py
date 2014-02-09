@@ -91,7 +91,6 @@ INSTALLED_APPS = (
     'django_nose',
     'originalenclosure',
     'pars',
-    'werkzeug_debugger_runserver',
 )
 
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'

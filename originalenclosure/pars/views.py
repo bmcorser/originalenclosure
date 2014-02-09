@@ -15,6 +15,7 @@ from django.views.generic import ListView
 from .models import ParSeeRun, ParSee, Par, Purchase
 from . import purchases
 from .forms import ParForm, ImageForm
+from .tasks import sleep_task
 
 def legacy_par(request,par):
     try:
@@ -158,6 +159,10 @@ def purchase_rendered(request, slug, uuid):
 @csrf_exempt
 def gumroad_ping(request):
     purchase = Purchase.objects.get(gumroad_id=request.POST['permalink'])
-    purchase.sale = datetime.now()
-    purchase.save()
-    return HttpResponse()
+    return render_to_response(
+        'pars/purchase.html',
+        {'gumroad_id': purchase.gumroad_id, 'pdf_url': pdf_url})
+
+def request_sleep(request, sleep_time):
+    sleeping = sleep_task.delay(int(sleep_time))
+    return HttpResponse(sleeping.id)

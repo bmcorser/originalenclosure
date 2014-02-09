@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os, re
+from time import sleep
 
 import requests
 from requests.auth import HTTPBasicAuth
@@ -15,6 +16,10 @@ from celery import task
 
 TIMEOUT = 30
 
+@task
+def sleep_task(n):
+    sleep(n)
+    return 'slupt'
 
 @task
 def facebook():
@@ -63,52 +68,3 @@ def facebook():
             Par.objects.filter(in_buffer=True).update(in_buffer=False)
     else:
         print 'nothing to do'
-
-@task
-def make_gumroad_product(par):
-    webhook_string = 'http://www.originalenclosure.net/pars/gumroad/{0}'
-    webhook_url = webhook_string.format(par.hash())
-    description_string = 'Ownership of par number {0}, entitled {1}'
-    description = description_string.format(par.number, par.title)
-    payload = {'name': par.__unicode__(),
-               'url': 'http://www.originalenclosure.net/static/pars/par.pdf',
-               'price': 100,
-               'description': description,
-               'country_available': 'UK',
-               'max_purchase_count': 1,
-               'customizable_price': 'true',
-               'webhook': webhook_url,
-               'require_shipping':'false',
-               'shown_on_profile':'false'}
-    files = {'preview': open(os.path.join(settings.MEDIA_ROOT,'par.jpg'))}
-    response =  requests.post(
-        settings.GUMROAD_API_URL,
-        data=payload,
-        files=files,
-        auth=HTTPBasicAuth(settings.GUMROAD_TOKEN, '',))
-    return response.status_code, response.content
-
-
-@task
-def seen(image):
-    try:
-        url = image.source
-    except AttributeError:
-        return False
-    # here we go with returning an asyncresult object to poll on
-    if url == '':
-        return False
-    ua = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT; python requests)'
-    try:
-        r = requests.head(url, headers={'User-Agent': ua}, timeout=TIMEOUT)
-    except (requests.exceptions.ConnectionError,
-            requests.exceptions.Timeout):
-        r = requests.Response()
-    regex = re.compile(r'^image')
-    if not r.status_code == requests.codes.ok:
-        return False
-    if not r.headers['content-type']:
-        r = requests.get(url, headers=headers, timeout=TIMEOUT)
-        if not r.headers['content-type']:
-            return False
-    return bool(regex.match(r.headers['content-type']))
