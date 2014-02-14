@@ -13,6 +13,10 @@ STATIC_ROOT = join(ROOT, 'static')
 MEDIA_URL = '/media/'
 STATIC_URL = '/static/'
 
+BOWER_COMPONENTS_ROOT = join(ROOT, 'components')
+BOWER_INSTALLED_APPS = (
+    'jquery#1.9',
+)
 
 DATABASES = {
     'default': {
@@ -55,6 +59,7 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    'djangobower.finders.BowerFinder',
 )
 
 TEMPLATE_LOADERS = (
@@ -86,6 +91,8 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.admin',
+    'djangobower',
+    'djangojs',
     'djcelery',
     'south',
     'django_nose',

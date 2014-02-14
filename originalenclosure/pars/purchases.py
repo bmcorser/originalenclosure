@@ -2,7 +2,8 @@ from os.path import join, isfile
 from subprocess import Popen
 import json
 import requests
-from pars.models import Purchase
+from celery import task
+from .models import Purchase
 
 import xhtml2pdf.pisa as pisa
 
@@ -25,57 +26,46 @@ def _link_callback(uri, rel):
             raise Exception(message)
     return path
 
-def make_pdf(par, uuid=None):
+@task(name='building pdf', trail=True)
+def make_pdf(purchase):
     from . import views
-    filename = '{0}.pdf'.format(par.slug)
-    if uuid:
-        filename = '{0}-{1}.pdf'.format(par.slug, uuid)
-    html = views.par_pdf(par, uuid)
-    pdf_path = join(settings.MEDIA_ROOT, 'pars', 'purchases', filename)
-    pdf = open(pdf_path, 'w+b')
+    html = views.par_pdf(purchase.par, purchase.uuid)
+    pdf = open(purchase.pdf_path, 'w+b')
     pisa_status = pisa.CreatePDF(html,
                                  dest=pdf,
                                  link_callback=_link_callback)
     pdf.close()
-    return filename
+    return purchase.serialise()
 
-def make_png(pdf_path, purchase):
-    purchases_path = join(settings.MEDIA_ROOT,
-                          'pars',
-                          'purchases')
-    outpath = join(purchases_path, '{0}.png'.format(purchase.uuid))
+@task(name='rendering png', trail=True)
+def make_png(purchase):
+    purchase = Purchase.objects.get(uuid=purchase['uuid'])
     ghostscript_cmd = [
         'gs',
         '-sDEVICE=png16m',
-        '-sOutputFile={0}'.format(outpath),
+        '-sOutputFile={0}'.format(purchase.png_path),
         '-r600',
         '-dDownScaleFactor=6',
         '-dQUIET',
         '-dBATCH',
         '-dNOPAUSE',
-        join(purchases_path, purchase.pdf),
+        purchase.pdf_path,
     ]
     assert Popen(ghostscript_cmd).wait() == 0
-    return outpath
+    return purchase.serialise()
 
+@task(name='making gumroad product', trail=True)
 def make_gumroad_product(purchase):
+    purchase = Purchase.objects.get(uuid=purchase['uuid'])
     filter_kwargs = {
         'par': purchase.par,
         'sale__isnull': False,
     }
     purchase_count = Purchase.objects.filter(**filter_kwargs).count()
     url = 'https://api.gumroad.com/v2/products'
-    pdf_path = join(settings.MEDIA_ROOT, 'pars', 'purchases', purchase.pdf)
-    png_path = make_png(pdf_path, purchase)
-    url_components = [
-        settings.DOMAIN,
-        settings.MEDIA_URL.strip('/'),
-        'pars',
-        'purchases',
-    ]
     data = {
-        'url': '/'.join(url_components + [purchase.pdf]),
-        'preview_url': '/'.join(url_components + ['{0}.png'.format(purchase.uuid)]),
+        'url': purchase.pdf_url,
+        'preview_url': purchase.png_url,
         'access_token': settings.GUMROAD_ACCESS_TOKEN,
         'name': '{0} ({1})'.format(purchase.par, purchase.uuid),
         'price':  (purchase_count + 1) * 100,
@@ -85,4 +75,4 @@ def make_gumroad_product(purchase):
     short_url = response_dict['product']['short_url']
     purchase.gumroad_id = short_url.split('/')[-1:][0]
     purchase.save()
-    return purchase
+    return purchase.serialise()

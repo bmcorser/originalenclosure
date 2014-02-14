@@ -113,6 +113,7 @@ class Purchase(models.Model):
                             default=make_uuid,
                             editable=False)
     par = models.ForeignKey(Par)
+    build = models.DateTimeField(auto_now_add=True)
     sale = models.DateTimeField(null=True)
     pdf = models.CharField(max_length=1000, null=True)
     gumroad_id = models.CharField(max_length=512,
@@ -122,6 +123,54 @@ class Purchase(models.Model):
 
     def __unicode__(self):
         return '{0} ({1})'.format(self.par, self.uuid)
+
+    def build_url(self, ext):
+        assert self.uuid
+        assert self.par
+        url_components = (
+            settings.DOMAIN,
+            settings.MEDIA_URL.strip('/'),
+            'pars',
+            'purchases',
+            '{0}-{1}.{2}'.format(self.par.slug, self.uuid, ext),
+        )
+        return '/'.join(url_components)
+
+    def build_path(self, ext):
+        assert self.uuid
+        assert self.par
+        path_components = (
+            settings.MEDIA_ROOT,
+            'pars',
+            'purchases',
+            '{0}-{1}.{2}'.format(self.par.slug, self.uuid, ext),
+        )
+        return join(*path_components)
+
+    @property
+    def png_url(self):
+        return self.build_url('png')
+
+    @property
+    def pdf_url(self):
+        return self.build_url('pdf')
+
+    @property
+    def png_path(self):
+        return self.build_path('png')
+
+    @property
+    def pdf_path(self):
+        return self.build_path('pdf')
+
+    def serialise(self, extra={}):
+        return_dict = {
+            'uuid': self.uuid,
+            'pdf_url': self.pdf_url,
+            'png_url': self.png_url,
+        }
+        return_dict.update(extra)
+        return return_dict
 
 
 class ParSeeRun(models.Model):

@@ -32,13 +32,54 @@
   }
 </style>
 <script type="text/javascript" src="http://gumroad.com/js/gumroad-embed.js"></script>
+{% load static %}
+<script type="text/javascript" src='{% static 'jquery/jquery.js' %}'></script>
 {% endblock %}
 {% block body %}
+{% load js %}
+{% django_js %}
 <div class="layout">
-  <div>
-    <a href="{% url permapar slug=par.slug %}">x</a>
+  <div id="purchase">
+    <a href="{% url parhome %}">x</a>
       <p>thanks</p>
-      <div class="gumroad-product-embed" data-gumroad-product-id="{{ gumroad_id }}"></div>
+      <p id="messages">...</p>
+      <script type="text/javascript">
+        $(document).ready(function(){
+            var task_list = {{ task_list|safe }};
+            var task_index = 0;
+            var task = task_list[task_index];
+
+            var gumroad = function(purchase){
+                $('#messages').text('done');
+                var gumroad_element = $('<div/>').attr({'class': 'gumroad-product-embed'})
+                                                 .data('gumroad-product-id', purchase.gumroad_id)
+                $('#purchase').html(gumroad_element);
+            };
+
+            var poll = function(task_id) {
+                $.ajax({
+                    url: Django.url('task_status', task_id),
+                    success: function(response){
+                        $('#messages').text(task.name);
+                        if (response.task.status == "PENDING"){
+                            var poll_ = function(){ poll(task_id) };
+                            setTimeout(poll_, 200);
+                        } else if (response.task.status == "SUCCESS"){
+                            if (task_index + 1 < task_list.length) {
+                                task_index = task_index + 1;
+                                task = task_list[task_index];
+                                var poll_ = function(){ poll(task.id) };
+                                setTimeout(poll_, 200);
+                            } else {
+                                gumroad(response.task.result);
+                            };
+                        };
+                    }
+                });
+            };
+            poll(task.id);
+        });
+      </script>
   </div>
 </div>
 {% endblock %}

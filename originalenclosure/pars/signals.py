@@ -1,5 +1,6 @@
 import tempfile, os
 import requests
+from celery.signals import after_task_publish
 from urlparse import urlparse
 from slugify import slugify
 from django.conf import settings

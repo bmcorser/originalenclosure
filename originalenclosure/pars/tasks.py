@@ -13,13 +13,14 @@ from pars.models import Par, Image
 
 from celery import task
 
+from .purchases import make_pdf, make_png, make_gumroad_product
 
 TIMEOUT = 30
 
 @task
 def sleep_task(n):
     sleep(n)
-    return 'slupt'
+    return 'sleeping completed'
 
 @task
 def facebook():

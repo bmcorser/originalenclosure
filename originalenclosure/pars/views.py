@@ -1,7 +1,10 @@
 #coding: utf-8
-from datetime import datetime
 from django.views.decorators.csrf import csrf_exempt
+import json
 from os.path import join
+
+from celery import chain
+
 from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -15,7 +18,12 @@ from django.views.generic import ListView
 from .models import ParSeeRun, ParSee, Par, Purchase
 from . import purchases
 from .forms import ParForm, ImageForm
-from .tasks import sleep_task
+from .tasks import (
+    sleep_task,
+    make_pdf,
+    make_png,
+    make_gumroad_product,
+)
 
 def legacy_par(request,par):
     try:
@@ -121,16 +129,6 @@ def make(request):
     },
     context_instance=RequestContext(request))
 
-def review():
-  u"✝★⚑☺♢"
-
-def gumroad(request, hash=None):
-    from ipdb import set_trace;set_trace()
-    return HttpResponse(
-        content_type='text/plain',
-        content='http://www.originalenclosure.net/pars/'
-    )
-
 class ParSeeRunsView(ListView):
     queryset = ParSeeRun.objects.prefetch_related().all()
     template_name = 'pars/parseeruns.html'
@@ -140,21 +138,27 @@ def purchase(request, slug):
     par = Par.objects.get(slug=slug)
     purchase = Purchase(par=par)
     purchase.save()
-    purchase.pdf = purchases.make_pdf(par, purchase.uuid)
-    purchase.save()
-    purchase = purchases.make_gumroad_product(purchase)
-    redirect_kwargs = {'slug': par.slug, 'uuid': purchase.uuid}
-    return HttpResponseRedirect(reverse('purchase_rendered',
-                                        kwargs=redirect_kwargs))
+    task_chain = chain(make_pdf.s(purchase),
+                       make_png.s(),
+                       make_gumroad_product.s())()
 
-def purchase_rendered(request, slug, uuid):
-    par = Par.objects.get(slug=slug)
-    purchase = Purchase.objects.get(uuid=uuid)
+    def add_parents(task, list_=[]):
+        list_.insert(0, {
+            'id': task.id,
+            'name': task.task_name,
+        })
+        if not task.parent:
+            return list_
+        return add_parents(task.parent, list_)
+
+    task_list = add_parents(task_chain)
+
     template_dict = {
-        'par': par,
-        'gumroad_id': purchase.gumroad_id,
+        'purchase': purchase.serialise(),
+        'task_list': json.dumps(task_list),
     }
     return render_to_response('pars/purchase.html', template_dict)
+
 
 @csrf_exempt
 def gumroad_ping(request):

@@ -23,6 +23,9 @@ urlpatterns = patterns('',
     # apps
     url(r'^pars/', include('pars.urls')),
 
+    # plugins
+    url(r'^djangojs/', include('djangojs.urls')),
+
 )
 
 if settings.DEBUG:

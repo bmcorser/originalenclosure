@@ -12,7 +12,6 @@ urlpatterns = patterns('pars.views',
         name='legacy_par'), # catch legacy urls
     url(r'^(?P<par>\d+)', 'par', name='par'),
     url(r'^permapar/(?P<slug>[\w-]+)', 'permapar', name='permapar'),
-    url(r'^gumroad/(?P<hash>[\w-]+)', 'gumroad', name='gumroad'),
     url(r'^parseeruns', ParSeeRunsView.as_view(), name='parseeruns'),
     url(r'^purchase/(?P<slug>[\w-]+)', 'purchase', name='purchase'),
     url(r'^purchase_rendered/(?P<slug>[\w-]+)/(?P<uuid>[\w]+)',
