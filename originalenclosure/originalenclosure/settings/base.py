@@ -15,7 +15,7 @@ STATIC_URL = '/static/'
 
 BOWER_COMPONENTS_ROOT = join(ROOT, 'components')
 BOWER_INSTALLED_APPS = (
-    'jquery#1.9',
+    'jquery#1.7.2',
 )
 
 DATABASES = {

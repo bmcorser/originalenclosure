@@ -1,5 +1,4 @@
 from .base import *
-from celery.schedules import crontab
 
 
 LOGGING = {
@@ -27,15 +26,4 @@ LOGGING = {
 }
 
 CELERY_RESULT_BACKEND = "redis://localhost/7"
-BROKER_URL = "amqp://guest:guest@localhost:5672//"
-
-CELERYBEAT_SCHEDULE = {
-    'pars-buffer': {
-        'task': 'pars.tasks.facebook',
-        'schedule': crontab(day_of_week='tue,thu',hour=18)
-    },
-    'celery-test': {
-        'task': 'originalenclosure.tasks.celery_test',
-        'schedule': crontab()
-    }
-}
+BROKER_URL = "amqp://guest:guest@localhost:5673//"

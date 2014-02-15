@@ -168,6 +168,7 @@ class Purchase(models.Model):
             'uuid': self.uuid,
             'pdf_url': self.pdf_url,
             'png_url': self.png_url,
+            'gumroad_id': self.gumroad_id,
         }
         return_dict.update(extra)
         return return_dict
