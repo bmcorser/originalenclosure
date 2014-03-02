@@ -35,8 +35,8 @@ def facebook():
             return subject/context*100
 
         description_dict = {
-            'dead': '{:.2}%'.format(percent(Image,'dead')),
-            'redacted': '{:.2}%'.format(percent(Par,'hidden'))
+            'dead': '{:.2f}%'.format(percent(Image,'dead')),
+            'redacted': '{:.2f}%'.format(percent(Par,'hidden'))
         }
 
         par_buffer = Par.objects.filter(in_buffer=True) 

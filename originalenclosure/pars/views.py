@@ -1,5 +1,5 @@
 #coding: utf-8
-from django.views.decorators.csrf import csrf_exempt
+from datetime import datetime
 import json
 from os.path import join
 
@@ -13,6 +13,7 @@ from django.shortcuts import render_to_response
 from django.template.loader import render_to_string
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView
 
 from .models import ParSeeRun, ParSee, Par, Purchase
@@ -163,6 +164,8 @@ def purchase(request, slug):
 @csrf_exempt
 def gumroad_ping(request):
     purchase = Purchase.objects.get(gumroad_id=request.POST['permalink'])
+    purchase.sale = datetime.now()
+    purchase.save()
     return render_to_response(
         'pars/purchase.html',
         {'gumroad_id': purchase.gumroad_id, 'pdf_url': pdf_url})
