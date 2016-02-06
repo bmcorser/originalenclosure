@@ -1,6 +1,10 @@
 from .base import *
 
-DOMAIN = 'http://localhost:8000'
+import os
+os.putenv('LANG', 'en_GB.UTF-8')
+os.putenv('LC_ALL', 'en_GB.UTF-8')
+
+DOMAIN = 'http://localhost:4040'
 
 DEBUG = True
 DATABASES = {

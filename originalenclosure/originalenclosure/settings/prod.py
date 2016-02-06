@@ -1,5 +1,6 @@
 from .base import *
 
+DEBUG = False
 
 LOGGING = {
     'version': 1,
@@ -26,4 +27,4 @@ LOGGING = {
 }
 
 CELERY_RESULT_BACKEND = "redis://localhost/7"
-BROKER_URL = "amqp://guest:guest@localhost:5673//"
+BROKER_URL = "amqp://guest:guest@localhost:5672//"

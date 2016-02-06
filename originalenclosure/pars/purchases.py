@@ -40,6 +40,7 @@ def make_pdf(purchase):
 @task(name='rendering png', trail=True)
 def make_png(purchase):
     purchase = Purchase.objects.get(uuid=purchase['uuid'])
+    print(purchase.png_path)
     ghostscript_cmd = [
         'gs',
         '-sDEVICE=png16m',

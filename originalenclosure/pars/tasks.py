@@ -29,8 +29,7 @@ def facebook():
     if Par.objects.filter(in_buffer=True).count() > 17:
 
         def percent(model, filter):
-            kwargs = {filter: True}
-            subject = float(model.objects.filter(**kwargs).count())
+            subject = float(model.objects.filter(**{filter: True}).count())
             context = float(model.objects.all().count())
             return subject/context*100
 
