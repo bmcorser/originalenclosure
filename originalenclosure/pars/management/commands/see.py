@@ -1,11 +1,77 @@
 # -*- coding: utf-8 -*-
 from collections import namedtuple
 from datetime import datetime, timedelta
+import re
+import urllib
+
 from django.core.management.base import BaseCommand
+from django.db.models import Q
 from time import sleep
+import grequests
+import requests
 import djcelery
-from pars.models import ParSeeRun, ParSee, Par
-from pars.tasks import seen
+from pars.models import ParSeeRun, ParSee, Image, Par
+
+TIMEOUT = 5
+HEADERS = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.103 Safari/537.36'}
+IMAGE_REGEX = re.compile(r'^[iI]mage')
+PROXY_URL = 'http://www.proxy-service.de/proxy-service.php?u='
+FAIL_TEMPLATE = '''
+===
+ID:     {0}
+RESP:   {1}
+SOURCE: {2}
+'''
+
+class ImageHasNoSource(Exception):
+    pass
+
+def get_url(image):
+    try:
+        url = image.source
+        if not url:
+            raise ImageHasNoSource(image)
+        return url
+    except AttributeError:
+        raise ImageHasNoSource(image)
+        
+
+def seen(url, method):
+    fn = getattr(grequests, method)
+    return fn(
+        PROXY_URL + urllib.quote(url, ''),
+        headers=HEADERS,
+        timeout=TIMEOUT
+    )
+
+def exception_handler(req, exc):
+    print(exc)
+    return False
+
+def append_dead_return_failed(responses, images, dead):
+    failed = []
+    for index, resp in enumerate(responses):
+        if isinstance(resp, Exception) or not resp:
+            resp_failed = True
+        else:
+            resp_failed = any((
+                resp.status_code != requests.codes.ok,
+                not resp.headers['content-type'],
+            ))
+        if resp_failed:
+            print(FAIL_TEMPLATE.format(images[index].id, resp, images[index].source))
+            failed.append(images[index])
+            continue
+        if not IMAGE_REGEX.match(resp.headers['content-type']):
+            dead.append(images[index])
+        not_dead = all((
+            resp.status_code == requests.codes.ok,
+            not IMAGE_REGEX.match(resp.headers['content-type']),
+        ))
+        if not_dead:
+            images[index].dead = False
+            images[index].save()
+    return failed
 
 class Command(BaseCommand):
     help = "Sees if par images are available at source"
@@ -21,30 +87,40 @@ class Command(BaseCommand):
         ###################
         run_start = datetime.now()
 
-        # for par in Par.objects.all():
-        for par in Par.objects.filter(created__gt=datetime.now() - timedelta(days=20)):
-            temp_parsee = TempParSee(par,
-                                     seen.delay(par.left),
-                                     seen.delay(par.right))
-            results.append(temp_parsee)
+        heads_images = []
+        heads = []
+        images = Image.objects.all();
+        # pars = Par.objects.all()
+        # pars = Par.objects.filter(
+            # created__gt=datetime.now() - timedelta(days=60))
+        # par = Par.objects.filter(number='1099')[0]
+        for image in images:
+        # for image in [par.right]:
+            try:
+                heads.append(seen(get_url(image), 'head'))
+                heads_images.append(image)
+            except ImageHasNoSource as exc:
+                print(exc)
+
+        dead = []
+        gets_images = append_dead_return_failed(
+            grequests.map(heads, size=10), heads_images, dead
+        )
+        gets = [seen(image.source, 'get') for image in gets_images]
+        dead.extend(
+            append_dead_return_failed(
+                grequests.map(gets, size=10), gets_images, dead
+            )
+        )
+        for image in dead:
+            print(getattr(image, 'source'))
+            image.dead = True
+            image.save()
         
-        def _ready(result):
-            return all([result.l.ready(), result.r.ready()])
-
-        so_far = []
-        while not all(map(_ready, results)):
-            print '[{0}] waiting'.format(datetime.now())
-            this_poll = [result.par for result in results
-                         if result.par not in so_far
-                         and _ready(result)]
-            so_far.append(this_poll)
-            for par in this_poll:
-                self.stdout.write(par)
-            sleep(.1)
-
         #################
         #### RUN END ####
         #################
+        '''
         run_end = datetime.now()
 
         parseerun = ParSeeRun(start=run_start,
@@ -59,4 +135,5 @@ class Command(BaseCommand):
             parsee.save()
             self.stdout.write('Finished looking at {0}\n'.format(parsee.par))
 
-        map(_temp_to_db, ready)
+        map(_temp_to_db, so_far)
+        '''
