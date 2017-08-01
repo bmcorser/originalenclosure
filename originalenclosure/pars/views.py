@@ -146,7 +146,7 @@ def purchase(request, slug):
     def add_parents(task, list_=[]):
         list_.insert(0, {
             'id': task.id,
-            'name': task.task_name,
+            'name': task.id,
         })
         if not task.parent:
             return list_

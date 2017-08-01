@@ -87,8 +87,6 @@ class Par(models.Model):
         Send a tweet of this par to the account defined in settings.
         Will not happen if DEBUG = True
         """
-        if settings.DEBUG:
-            return
         auth = tweepy.OAuthHandler(
             settings.TWITTER_CONSUMER_KEY, settings.TWITTER_CONSUMER_SECRET)
         auth.set_access_token(
@@ -143,7 +141,7 @@ class Purchase(models.Model):
             settings.MEDIA_ROOT,
             'pars',
             'purchases',
-            '{0}-{1}.{2}'.format(self.par.slug, self.uuid, ext),
+            u'{0}-{1}.{2}'.format(self.par.slug, self.uuid, ext),
         )
         return join(*path_components)
 

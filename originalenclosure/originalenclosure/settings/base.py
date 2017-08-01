@@ -104,4 +104,4 @@ TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 NOSE_ARGS = ['--nologcapture']
 
 GUMROAD_API_URL = 'https://api.gumroad.com/v1/links'
-DOMAIN = 'https://originalenclosure.net'
+DOMAIN = 'http://originalenclosure.net'

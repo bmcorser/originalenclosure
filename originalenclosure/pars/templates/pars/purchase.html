@@ -48,7 +48,7 @@
             var task_list = {{ task_list|safe }};
             var task_index = 0;
             var task = task_list[task_index];
-            var gumroad_url = 'https://gumroad.com/l/%?wanted=true';
+            var gumroad_url = '%';
             var poll = function(task_id) {
                 $.ajax({
                     url: Django.url('task_status', task_id),
@@ -65,7 +65,7 @@
                                 setTimeout(poll_, 200);
                             } else {
                                 var purchase = response.task.result;
-                                var href = gumroad_url.replace('%', purchase.gumroad_id);
+                                var href = gumroad_url.replace('%', purchase.pdf_url);
                                 $('#messages').html([
                                     $('<p/>').html($('<a/>').text('pay').attr('href', href)),
                                     $('<img/>').attr({'width': 200, 'src': purchase.png_url})

@@ -62,6 +62,7 @@ def make_gumroad_product(purchase):
         'par': purchase.par,
         'sale__isnull': False,
     }
+    '''
     purchase_count = Purchase.objects.filter(**filter_kwargs).count()
     url = 'https://api.gumroad.com/v2/products'
     data = {
@@ -72,8 +73,11 @@ def make_gumroad_product(purchase):
         'price':  (purchase_count + 1) * 100,
     }
     response = requests.post(url, data=data)
+    print(response.status_code)
+    print(response.content)
     response_dict = json.loads(response.content)
     short_url = response_dict['product']['short_url']
     purchase.gumroad_id = short_url.split('/')[-1:][0]
+    '''
     purchase.save()
     return purchase.serialise()

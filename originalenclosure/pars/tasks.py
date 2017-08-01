@@ -77,9 +77,7 @@ def facebook():
             attachment=encoded_dict(payload)
         )
         print resp
-        '''
         if 'id' in resp:  # assume everything's ok
             Par.objects.filter(in_buffer=True).update(in_buffer=False)
-        '''
     else:
         print 'nothing to do'

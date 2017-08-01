@@ -3,6 +3,7 @@ from collections import namedtuple
 from datetime import datetime, timedelta
 import re
 import urllib
+import time
 
 from django.core.management.base import BaseCommand
 from django.db.models import Q
@@ -20,7 +21,8 @@ FAIL_TEMPLATE = '''
 ===
 ID:     {0}
 RESP:   {1}
-SOURCE: {2}
+TYPE:   {2}
+SOURCE: {3}
 '''
 
 class ImageHasNoSource(Exception):
@@ -37,15 +39,31 @@ def get_url(image):
         
 
 def seen(url, method):
-    fn = getattr(grequests, method)
-    return fn(
-        PROXY_URL + urllib.quote(url, ''),
-        headers=HEADERS,
-        timeout=TIMEOUT
-    )
+    fn = getattr(requests, method)
+    print('===')
+    print(url)
+    tries = 0
+    while tries < 2:
+        try:
+            tries += 1
+            resp = fn(
+                # PROXY_URL + urllib.quote(url, ''),
+                url,
+                headers=HEADERS,
+                timeout=TIMEOUT
+            )
+            print(resp)
+            print(resp.headers.get('content-type'))
+            return resp
+        except (
+            requests.exceptions.Timeout,
+            requests.exceptions.ConnectionsError,
+        ) as exc:
+            time.sleep(0.5)
+            pass
 
 def exception_handler(req, exc):
-    print(exc)
+    print(exc.__class__.__name__)
     return False
 
 def append_dead_return_failed(responses, images, dead):
@@ -59,14 +77,22 @@ def append_dead_return_failed(responses, images, dead):
                 not resp.headers['content-type'],
             ))
         if resp_failed:
-            print(FAIL_TEMPLATE.format(images[index].id, resp, images[index].source))
+            if resp is not None:
+                print(FAIL_TEMPLATE.format(
+                    images[index].id,
+                    resp,
+                    resp.headers.get('content-type'),
+                    images[index].source)
+                )
+            else:
+                print("SERVER DEAD: {0}".format(images[index]))
             failed.append(images[index])
             continue
         if not IMAGE_REGEX.match(resp.headers['content-type']):
             dead.append(images[index])
         not_dead = all((
             resp.status_code == requests.codes.ok,
-            not IMAGE_REGEX.match(resp.headers['content-type']),
+            IMAGE_REGEX.match(resp.headers['content-type']),
         ))
         if not_dead:
             images[index].dead = False
@@ -87,9 +113,12 @@ class Command(BaseCommand):
         ###################
         run_start = datetime.now()
 
+        dead = []
+
         heads_images = []
         heads = []
-        images = Image.objects.all();
+        # images = Image.objects.all();
+        images = Image.objects.filter(Q(dead=True), Q(right__isnull=False) | Q(left__isnull=False));
         # pars = Par.objects.all()
         # pars = Par.objects.filter(
             # created__gt=datetime.now() - timedelta(days=60))
@@ -97,21 +126,16 @@ class Command(BaseCommand):
         for image in images:
         # for image in [par.right]:
             try:
-                heads.append(seen(get_url(image), 'head'))
-                heads_images.append(image)
+                # heads.append(seen(get_url(image), 'head'))
+                # heads_images.append(image)
+                dead.extend(append_dead_return_failed([seen(get_url(image), 'head')], [image], dead))
             except ImageHasNoSource as exc:
                 print(exc)
 
-        dead = []
-        gets_images = append_dead_return_failed(
-            grequests.map(heads, size=10), heads_images, dead
-        )
-        gets = [seen(image.source, 'get') for image in gets_images]
-        dead.extend(
-            append_dead_return_failed(
-                grequests.map(gets, size=10), gets_images, dead
-            )
-        )
+        # gets_images = append_dead_return_failed(heads, heads_images, dead)
+        # gets = [seen(image.source, 'get') for image in gets_images]
+        # dead.extend(append_dead_return_failed(gets, gets_images, dead))
+        '''
         for image in dead:
             print(getattr(image, 'source'))
             image.dead = True
@@ -120,7 +144,6 @@ class Command(BaseCommand):
         #################
         #### RUN END ####
         #################
-        '''
         run_end = datetime.now()
 
         parseerun = ParSeeRun(start=run_start,
