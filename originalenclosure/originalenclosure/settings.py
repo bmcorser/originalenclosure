@@ -1,4 +1,3 @@
-from celery.schedules import crontab
 import os
 
 TOP_FOLDER = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
@@ -108,16 +107,11 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.admin',
-    'djcelery',
     'south',
-    'django_nose',
     'originalenclosure',
     'pars',
-    'werkzeug_debugger_runserver',
 )
 
-TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
-NOSE_ARGS = ['--nologcapture']
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
 # the site admins on every HTTP 500 error when DEBUG=False.
@@ -147,25 +141,7 @@ LOGGING = {
     }
 }
 
-import djcelery
-djcelery.setup_loader()
-CELERY_RESULT_BACKEND = "redis://localhost/7"
-BROKER_URL = "amqp://guest:guest@localhost:5672//"
-
-CELERYBEAT_SCHEDULE = {
-    'pars-buffer': {
-        'task': 'pars.tasks.facebook',
-        'schedule': crontab(day_of_week='tue,thu',hour=18)
-    },
-    'celery-test': {
-        'task': 'originalenclosure.tasks.celery_test',
-        'schedule': crontab()
-    }
-}
-
 APPEND_SLASH = True
-
-GUMROAD_API_URL = 'https://api.gumroad.com/v1/links'
 
 try:
     from local_settings import *

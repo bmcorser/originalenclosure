@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block title %}original enclosure login{% endblock %}
 {% block body %}
-<form method="post" action="{% url django.contrib.auth.views.login %}">
+<form method="post" action="{% url "django.contrib.auth.views.login" %}">
   {% csrf_token %}
 {{ form.username.label_tag }}
 {{ form.username }}

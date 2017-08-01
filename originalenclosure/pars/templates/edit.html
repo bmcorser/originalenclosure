@@ -2,10 +2,10 @@
 
 {% block body %}
 {% if older %}
-<a href="{% url edit older.number %}">←</a>
+<a href="{% url "edit" older.number %}">←</a>
 {% endif %}
 {% if newer %}
-<a href="{% url edit newer.number %}">→</a>
+<a href="{% url "edit" newer.number %}">→</a>
 {% endif %}
 <form method="post" action="">
 {% csrf_token %}
@@ -15,6 +15,6 @@
 <input type="submit" value="update">
 </form>
 <img src="{{ par.left.image.url }}" width="200" />
-<a href="{% url swap par.number %}">swap</a>
+<a href="{% url "swap" par.number %}">swap</a>
 <img src="{{ par.right.image.url }}" width="200" />
 {% endblock %}

@@ -1,20 +1,14 @@
 from django.conf.urls import patterns, include, url
 from django.conf import settings
 from django.contrib import admin
-from django.views.generic.simple import direct_to_template
+from django.views.generic import TemplateView
 admin.autodiscover()
 
 urlpatterns = patterns('',
     # static pages
     url(
         r'^$',
-        direct_to_template,
-        {'template':'home.html'},
-        name='home'),
-    url(
-        r'^mcfp/$',
-        direct_to_template,
-        {'template':'home.html'},
+        TemplateView.as_view(template_name='home.html'),
         name='home'),
 
     # admin / login

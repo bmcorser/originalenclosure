@@ -35,9 +35,9 @@
 {% block body %}
 <div class="layout">
   <div>
-    <a href="{% url home %}">x</a>
+    <a href="{% url "home" %}">x</a>
     {% if older %}
-    <a href="{% url par older.number %}">older</a>
+    <a href="{% url "par" older.number %}">older</a>
     {% endif %}
   </div>
   <div class="par">

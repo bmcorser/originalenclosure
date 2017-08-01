@@ -1,7 +1,5 @@
 import os
 from .secrets import *
-import djcelery
-djcelery.setup_loader()
 
 TOP_FOLDER = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 MEDIA_ROOT = os.path.join(TOP_FOLDER, 'media')
@@ -82,15 +80,9 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.admin',
-    'djcelery',
     'south',
-    'django_nose',
     'originalenclosure',
     'pars',
-    'werkzeug_debugger_runserver',
 )
-
-TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
-NOSE_ARGS = ['--nologcapture']
 
 GUMROAD_API_URL = 'https://api.gumroad.com/v1/links'

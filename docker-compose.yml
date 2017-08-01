@@ -1,0 +1,19 @@
+version: "3"
+services:
+  django:
+    build:
+      context: .
+    links:
+      - db
+    entrypoint: dockerize -wait tcp://db:5432
+    command: python manage.py runserver 0.0.0.0:8000
+    # command: tail -f /dev/null
+    ports:
+      - 8000:8000
+  db:
+    image: postgres
+    volumes:
+      - ./volumes/db:/data/db
+    environment:
+      POSTGRES_USER: originalenclosure
+      POSTGRES_PASSWORD: pleasesee
